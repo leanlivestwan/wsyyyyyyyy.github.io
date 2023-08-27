@@ -1,0 +1,447 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Sanfor实习-大模型数据存储调研方案 | WSYのBlog</title><meta name="author" content="wsy"><meta name="copyright" content="wsy"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="大模型数据存储方案调研背景和需求在训练大模型时，通常需要使用大量的数据来训练模型。这些数据通常以CSV或JSON等文件格式存储。 需求描述： 为了解决数据版本管理的难题，需要开发一个数据管理系统，该系统能够支持以下功能： 1.数据上传与下载：用户可以通过系统将数据上传到系统中，并能够从系统中下载数据。 2.数据格式支持：系统应该支持CSV和JSON等常见的数据格式，以确保用户可以方便地上传和下载数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sanfor实习-大模型数据存储调研方案">
+<meta property="og:url" content="https://www.wsyssl.top/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:site_name" content="WSYのBlog">
+<meta property="og:description" content="大模型数据存储方案调研背景和需求在训练大模型时，通常需要使用大量的数据来训练模型。这些数据通常以CSV或JSON等文件格式存储。 需求描述： 为了解决数据版本管理的难题，需要开发一个数据管理系统，该系统能够支持以下功能： 1.数据上传与下载：用户可以通过系统将数据上传到系统中，并能够从系统中下载数据。 2.数据格式支持：系统应该支持CSV和JSON等常见的数据格式，以确保用户可以方便地上传和下载数">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images2.alphacoders.com/937/thumbbig-937391.webp">
+<meta property="article:published_time" content="2023-08-14T04:26:33.000Z">
+<meta property="article:modified_time" content="2023-08-14T04:40:32.722Z">
+<meta property="article:author" content="wsy">
+<meta property="article:tag" content="minio">
+<meta property="article:tag" content="dvc">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images2.alphacoders.com/937/thumbbig-937391.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://www.wsyssl.top/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Sanfor实习-大模型数据存储调研方案',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-08-14 12:40:32'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/font.css"><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (false) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/cat.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://images2.alphacoders.com/937/thumbbig-937391.webp')"><nav id="nav"><span id="blog-info"><a href="/" title="WSYのBlog"><span class="site-name">WSYのBlog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Sanfor实习-大模型数据存储调研方案</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-08-14T04:26:33.000Z" title="Created 2023-08-14 12:26:33">2023-08-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-08-14T04:40:32.722Z" title="Updated 2023-08-14 12:40:32">2023-08-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Sanfor%E5%AE%9E%E4%B9%A0/">Sanfor实习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">3.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>14min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Sanfor实习-大模型数据存储调研方案"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="大模型数据存储方案调研"><a href="#大模型数据存储方案调研" class="headerlink" title="大模型数据存储方案调研"></a><strong>大模型数据存储方案调研</strong></h1><h1 id="背景和需求"><a href="#背景和需求" class="headerlink" title="背景和需求"></a>背景和需求</h1><p>在训练大模型时，通常需要使用大量的数据来训练模型。这些数据通常以CSV或JSON等文件格式存储。</p>
+<p>需求描述：</p>
+<p>为了解决数据版本管理的难题，需要开发一个数据管理系统，该系统能够支持以下功能：</p>
+<p>1.数据上传与下载：用户可以通过系统将数据上传到系统中，并能够从系统中下载数据。</p>
+<p>2.数据格式支持：系统应该支持CSV和JSON等常见的数据格式，以确保用户可以方便地上传和下载数据。</p>
+<p>3.数据版本管理：系统应该能够跟踪数据的版本，并记录数据的修改历史。每次数据更新后，系统应该自动记录并保存新版本的数据，并能够让用户方便地查看和比较不同版本的数据。</p>
+<p>4.数据权限管理：系统应该能够为每个用户分配不同的数据权限。例如，某些用户可能只能查看数据，而其他用户可能能够修改和删除数据。</p>
+<p>5.数据备份与恢复：系统应该能够定期备份数据，并能够在需要时快速恢复数据。此外，系统应该能够提供数据恢复历史记录，以便用户可以查看以前备份的数据版本。</p>
+<p>6.数据安全性：系统应该采取适当的安全措施来保护数据的安全性和隐私性，例如加密和身份验证等。</p>
+<p>7.用户交互性：系统应该提供友好的用户界面或者简单的脚本，使用户可以方便地上传、下载、查看和比较不同版本的数据。</p>
+<h1 id="业界方案"><a href="#业界方案" class="headerlink" title="业界方案"></a>业界方案</h1><h2 id="2-1版本控制工具对比"><a href="#2-1版本控制工具对比" class="headerlink" title="2.1版本控制工具对比"></a>2.1版本控制工具对比</h2><table>
+<thead>
+<tr>
+<th>组件名称</th>
+<th>优点</th>
+<th>缺点</th>
+<th>参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Git LFS</td>
+<td>1.与Git集成紧密，易于使用和学习。2.开源免费。3.支持多种云存储服务，如GitHub，GitLab，Bitbucket等。4.可以通过指定文件大小或文件类型来选择哪些文件需要使用LFS管理。</td>
+<td>1.LFS存储需要额外的云存储空间和带宽，可能会增加成本。2.对于大型二进制文件，速度较慢，可能会影响开发效率。3.不支持文件锁定，可能造成冲突。</td>
+<td><a href="../text">https://docs.atrust.sangfor.com/pages/viewpage.action?pageId=177161067#id-01-skm-multi%E6%89%93%E5%8C%85%E6%94%B9%E8%BF%9Bgitlfs%E6%94%AF%E6%8C%81-%E6%96%B9%E6%A1%88%E9%80%89%E6%8B%A9</a>（内网）</td>
+</tr>
+<tr>
+<td>DVC</td>
+<td>1.兼容 Git对存储没有限制 2.低冲突分支 3.与语言和框架无关 4.支持HDFS、Hive 和 Apache Spark 4.不受 Git 托管限制。5.DVC 优化了大文件的存储和传输。</td>
+<td>在大型项目中，数据管道可能变得非常复杂，这可能使得使用 DVC 变得困难。虽然 DVC 与 Git 集成得非常好，但是与其他数据科学和机器学习工具的集成可能不那么顺畅。</td>
+<td><a href="../text">快速入门</a>DVC（三）：数据与模型版本管理 - 掘金<a href="../text">Version Data and Code - DagsHub Docs</a><a href="../text">python - Installation DVC on MinIO storage - Stack Overflow</a></td>
+</tr>
+<tr>
+<td>pachyderm</td>
+<td>1.Pachyderm 提供了对数据的版本管理功能，使您能够跟踪数据的变化历史。2.Pachyderm 通过记录每个数据版本的元数据和变化历史，确保数据处理管道的可重现性。3.Pachyderm 具备分布式处理的能力，可以处理大规模的数据集和复杂的处理管道。 它使用容器和分布式计算框架（如 Kubernetes）来实现高性能的数据处理和存储。</td>
+<td>配置繁琐，组件太新了。Pachyderm 的配置和管理可能需要一些额外的工作。 需要设置和管理数据管道、存储和计算资源等。</td>
+<td>在单服务器创建服务的话，连接会超时。借用sealosK8s环境，有很多依赖要配置很多信息，pod无法启动。</td>
+</tr>
+<tr>
+<td>ArtiVC</td>
+<td>1.一个方便的命令行工具，用于在云存储上进行数据版本控制。2.快照数据并在版本之间切换数据。3.ArtiVC支持三个主要的云提供商（AWS S3，Google Cloud Storage，Azure Blob Storage）和使用SSH的远程文件系统。</td>
+<td>avc 在能力上部分git 的命令支持并不是很多，但是从简单上来说还是很方便的不需要外部依赖，lakefs 是一个不错的基于git 的数据管理能力，而且社区也比较活跃。目前avc 似乎更偏向于fix 了，新功能比较少了，avc 代码量并不大。</td>
+<td><a href="../inline">GitHub - InfuseAI&#x2F;ArtiVC: A version control system to manage large files.</a><a href="../inline">Rclone</a>找到了一个方法需要依赖rclone：<a href="../text">GitHub - rongfengliang&#x2F;minio_rclone_artivc_learning: minio_rclone_artivc_learning</a></td>
+</tr>
+<tr>
+<td>Git Annex</td>
+<td>1.Git Annex 允许在不下载整个大文件的情况下获取其元数据。2.可以选择只在需要时获取大文件。</td>
+<td>1.Git Annex 的命令和工作流程与标准的 Git 工作流程不同。2.跨平台支持有限：虽然 Git Annex 支持多种操作系统，但在某些系统上的表现可能不如其他工具。</td>
+<td>与git工作流不太一样，不推荐</td>
+</tr>
+<tr>
+<td>Lake FS</td>
+<td>lakeFS 提供对数据湖的版本控制，并使用类似 Git 的语义来创建和访问这些版本。它与格式无关。1.适用于众多数据工具和平台。通过写入时复制机制最大限度地减少数据重复。2.在任何规模的数据湖中都能保持高性能。包括可配置的垃圾回收功能。3.在生产中得到了证明，并拥有一个活跃的社区。</td>
+<td>命令行操作的话需要lakectl，要是想要提交和合并分支的话，需要用脚本来</td>
+<td>后期维护成本不确定</td>
+</tr>
+<tr>
+<td>Mercurial Largefiles Extension</td>
+<td>1.Mercurial 是一个分布式版本控制系统，与 Git 类似。Largefiles Extension 是 Mercurial 的一个扩展，用于处理大文件。2.Largefiles Extension 的命令和工作流程与标准的 Mercurial 工作流程一致。</td>
+<td>1.需要 Mercurial：这是一个 Mercurial 的扩展，如果项目使用 Git，可能不合适。2.跨平台支持有限：虽然 Mercurial 支持多种操作系统，但在某些系统上的表现可能不如其他工具。</td>
+<td>与git不兼容，不推荐</td>
+</tr>
+<tr>
+<td>Perforce Helix Core</td>
+<td>1.支持大规模文件管理，具有高度可扩展性和可定制性。2.支持文件级别的锁定和权限控制。3.支持多种操作系统，包括Windows，Linux和MacOS等。</td>
+<td>1.需要学习新的工具和命令。2.价格较高，需要购买许可证。3.对于小型项目，可能会过于复杂。</td>
+<td>不开源，不推荐。</td>
+</tr>
+<tr>
+<td>SVN LFS</td>
+<td>1.与Subversion集成紧密，易于使用和学习。2.开源免费。3.支持多种云存储服务，如GitHub，GitLab，Bitbucket等。4.可以通过指定文件大小或文件类型来选择哪些文件需要使用LFS管理。</td>
+<td>1.对于大型二进制文件，速度较慢，可能会影响开发效率。2.不支持文件锁定，可能造成冲突。</td>
+<td>和其他组件集成有版本冲突问题，不推荐。</td>
+</tr>
+<tr>
+<td>Plastic SCM</td>
+<td>1.可视化的界面，易于使用和学习。2.分布式架构，支持多种工作流程。3.支持文件锁定和权限控制。</td>
+<td>1.价格较高，需要购买许可证。2.在大型团队或大型项目中，可能会出现性能问题3.不如Git或Subversion流行，缺乏相关社区和支持。</td>
+<td>不开源，不推荐。</td>
+</tr>
+</tbody></table>
+<h2 id="2-2挂载存储调研"><a href="#2-2挂载存储调研" class="headerlink" title="2.2挂载存储调研"></a>2.2挂载存储调研</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>ceph</th>
+<th>minio</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>开发语言</td>
+<td>C</td>
+<td>go</td>
+<td></td>
+</tr>
+<tr>
+<td>一致性</td>
+<td>强一致性</td>
+<td>强一致性</td>
+<td></td>
+</tr>
+<tr>
+<td>用户</td>
+<td>可拓展云原生数据库</td>
+<td>可拓展云原生数据库</td>
+<td></td>
+</tr>
+<tr>
+<td>存储方式</td>
+<td>块对象文件</td>
+<td>对象存储</td>
+<td></td>
+</tr>
+<tr>
+<td>活跃度</td>
+<td>高</td>
+<td>高</td>
+<td></td>
+</tr>
+<tr>
+<td>github star数</td>
+<td>12.2k</td>
+<td>40.1k</td>
+<td></td>
+</tr>
+<tr>
+<td>管理工具</td>
+<td>命令行和原生DashBoard</td>
+<td>命令行和操作界面</td>
+<td></td>
+</tr>
+<tr>
+<td>操作界面</td>
+<td>提供可视化界面面</td>
+<td>提供可视化界面</td>
+<td></td>
+</tr>
+<tr>
+<td>数据恢复</td>
+<td>Recove和backfill是Ceph数据修复中最重要的两个部分。</td>
+<td>使用纠删码、Checksum来防止错误和静默数据污染，数据恢复性好，即使丢失1&#x2F;2的磁盘也能恢复数据。</td>
+<td></td>
+</tr>
+<tr>
+<td>官网</td>
+<td><a href="https://ceph.com/en/">Ceph.io — Home</a></td>
+<td><a href="http://minio.org.cn/">MinIO | 高性能, Kubernetes 原生对象存储</a></td>
+<td></td>
+</tr>
+<tr>
+<td>学习成本</td>
+<td>高</td>
+<td>中</td>
+<td></td>
+</tr>
+<tr>
+<td>版本管理</td>
+<td>支持</td>
+<td>支持</td>
+<td></td>
+</tr>
+<tr>
+<td>组件兼容</td>
+<td>S3兼容API，并与所有现代数据框架（如Spark，Hive，AWS Athena，DuckDB和Presto）无缝协作。</td>
+<td>支持Veeak、SPark大数据处理组件、Hive数据仓库工具、AWS CLI底层存储服务，Nginx负载均衡组件等。</td>
+<td></td>
+</tr>
+<tr>
+<td>社区链接</td>
+<td><a href="https://ceph.com/en/community/">Ceph.io — Community</a></td>
+<td><a href="https://blog.minio.org.cn/">MinIO 博客</a></td>
+<td></td>
+</tr>
+<tr>
+<td>读写权限</td>
+<td></td>
+<td>nginx<a href="https://cloud.tencent.com/developer/article/2076784">使用Nginx反向代理minio，提供文件公共访问-腾讯云开发者社区-腾讯云</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h1 id="方案选型结论"><a href="#方案选型结论" class="headerlink" title="方案选型结论"></a>方案选型结论</h1><p>1.开发者角色（做数据修改、更新、提交）：dvc+minIO做版本管理，类git方式后台操作（补充dvc刚才说的项目创建和提交流程）。</p>
+<p>2.标注员角色（观察数据）：lakeFS激活分支，lakectel+rclone同步迁移minIO-&gt;lakeFS分支，前端通过激活的分支观测数据。</p>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><h2 id="4-1Lakefs"><a href="#4-1Lakefs" class="headerlink" title="4.1Lakefs"></a>4.1Lakefs</h2><p>docker部署lakefs，使用默认存储。</p>
+<p>内网测试链接：<a href="../text">http://10.109.97.231:8000/repositories/quickstart/objects</a></p>
+<p>access_key_id: AKIAJL66XTCWW6O6IRNQ</p>
+<p>secret_access_key: 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</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="keyword">run</span><span class="language-bash"> --name lakefs --pull always \</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line">-p <span class="number">8000</span>:<span class="number">8000</span> \</span><br><span class="line"></span><br><span class="line">treeverse/lakefs:latest \</span><br><span class="line"></span><br><span class="line"><span class="keyword">run</span><span class="language-bash"> --local-settings</span></span><br></pre></td></tr></table></figure>
+
+ <img src="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/png.png" class="" title="img">
+
+<img src="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/png-1691987397650-3.png" class="" title="img">
+
+<img src="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/png-1691987405190-6.png" class="" title="img">
+
+<img src="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/png-1691987416895-9.png" class="" title="img">
+
+<p>docker部署lakefs，使用minio作为底层存储，需要dremio组件。</p>
+<ol>
+<li>构建dremio的dockerfile。</li>
+</ol>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> DREMIO/DREMIO-OSS:<span class="number">20.1</span>.<span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">USER</span> ROOT</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> DREMIO-ENV /OPT/DREMIO/CONF/DREMIO-ENV</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> JPROFILER\_LINUX\_12\_0\_4.DEB /OPT/JPROFILER\_LINUX\_12\_0\_4.DEB</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> DPKG -I /OPT/JPROFILER\_LINUX\_12\_0\_4.DEB</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">USER</span> DREMIO</span><br></pre></td></tr></table></figure>
+
+<p> 2.创建docker-copose.yaml文件，进行编排。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="keyword">run</span><span class="language-bash"> --name lakefs --pull always \</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line">-p <span class="number">8000</span>:<span class="number">8000</span> \</span><br><span class="line"></span><br><span class="line">treeverse/lakefs:latest \</span><br><span class="line"></span><br><span class="line"><span class="keyword">run</span><span class="language-bash"> --local-settings</span></span><br><span class="line"></span><br><span class="line">lakefs搭配minio的配置文件</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>.docker-compose.yaml</span><br><span class="line"></span><br><span class="line">VERSION: <span class="string">&#x27;3&#x27;</span></span><br><span class="line"></span><br><span class="line">SERVICES:</span><br><span class="line"></span><br><span class="line">LAKEFS:</span><br><span class="line"></span><br><span class="line">IMAGE: DALONGRONG/LAKEFS:DEV-<span class="number">2022</span>-<span class="number">02</span>-<span class="number">09</span></span><br><span class="line"></span><br><span class="line">PORTS:</span><br><span class="line"></span><br><span class="line">- <span class="string">&quot;8000:8000&quot;</span></span><br><span class="line"></span><br><span class="line">DEPENDS\_ON:</span><br><span class="line"></span><br><span class="line">- <span class="string">&quot;POSTGRES&quot;</span></span><br><span class="line"></span><br><span class="line">ENVIRONMENT:</span><br><span class="line"></span><br><span class="line">- LAKEFS\_AUTH\_ENCRYPT\_SECRET\_KEY=$&#123;LAKEFS\_AUTH\_ENCRYPT\_SECRET\_KEY:-SOME RANDOM SECRET STRING&#125;</span><br><span class="line"></span><br><span class="line">- LAKEFS\_DATABASE\_CONNECTION\_STRING=$&#123;LAKEFS\_DATABASE\_CONNECTION\_STRING:-POSTGRES://LAKEFS:LAKEFS@POSTGRES/POSTGRES?SSLMODE=DISABLE&#125;</span><br><span class="line"></span><br><span class="line">- LAKEFS\_BLOCKSTORE\_TYPE=$&#123;LAKEFS\_BLOCKSTORE\_TYPE:-S3&#125;</span><br><span class="line"></span><br><span class="line">- LAKEFS\_BLOCKSTORE\_LOCAL\_PATH=$&#123;LAKEFS\_BLOCKSTORE\_LOCAL\_PATH:-/HOME/LAKEFS&#125;</span><br><span class="line"></span><br><span class="line">- LAKEFS\_GATEWAYS\_S3\_DOMAIN\_NAME=$&#123;LAKEFS\_GATEWAYS\_S3\_DOMAIN\_NAME:-S3.LOCAL.LAKEFS.IO:<span class="number">8000</span>&#125;</span><br><span class="line"></span><br><span class="line">- LAKEFS\_BLOCKSTORE\_S3\_CREDENTIALS\_ACCESS\_KEY\_ID=$&#123;AWS\_ACCESS\_KEY\_ID:-MINIO&#125;</span><br><span class="line"></span><br><span class="line">- LAKEFS\_BLOCKSTORE\_S3\_CREDENTIALS\_ACCESS\_SECRET\_KEY=$&#123;AWS\_SECRET\_ACCESS\_KEY:-MINIO123&#125;</span><br><span class="line"></span><br><span class="line">- LAKEFS\_LOGGING\_LEVEL=$&#123;LAKEFS\_LOGGING\_LEVEL:-INFO&#125;</span><br><span class="line"></span><br><span class="line">- LAKEFS\_STATS\_ENABLED</span><br><span class="line"></span><br><span class="line">- LAKEFS\_BLOCKSTORE\_S3\_ENDPOINT=HTTP://S3:<span class="number">9000</span></span><br><span class="line"></span><br><span class="line">- LAKEFS\_BLOCKSTORE\_S3\_FORCE\_PATH\_STYLE=TRUE</span><br><span class="line"></span><br><span class="line">- LAKEFS\_COMMITTED\_LOCAL\_CACHE\_DIR=$&#123;LAKEFS\_COMMITTED\_LOCAL\_CACHE\_DIR:-/HOME/LAKEFS/.LOCAL\_TIER&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash">:</span></span><br><span class="line"></span><br><span class="line">[</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;/APP/WAIT-FOR&quot;</span>,</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;POSTGRES:5432&quot;</span>,</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;--&quot;</span>,</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;/APP/LAKEFS&quot;</span>,</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;RUN&quot;</span></span><br><span class="line"></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">POSTGRES:</span><br><span class="line"></span><br><span class="line">IMAGE: <span class="string">&quot;POSTGRES:$&#123;PG\_VERSION:-11&#125;&quot;</span></span><br><span class="line"></span><br><span class="line">COMMAND: <span class="string">&quot;-C LOG\_MIN\_MESSAGES=FATAL&quot;</span></span><br><span class="line"></span><br><span class="line">PORTS:</span><br><span class="line"></span><br><span class="line">- <span class="string">&quot;5432:5432&quot;</span></span><br><span class="line"></span><br><span class="line">ENVIRONMENT:</span><br><span class="line"></span><br><span class="line">POSTGRES\_USER: LAKEFS</span><br><span class="line"></span><br><span class="line">POSTGRES\_PASSWORD: LAKEFS</span><br><span class="line"></span><br><span class="line">LOGGING:</span><br><span class="line"></span><br><span class="line">DRIVER: NONE</span><br><span class="line"></span><br><span class="line">DREMIO:</span><br><span class="line"></span><br><span class="line">BUILD: ./</span><br><span class="line"></span><br><span class="line">PORTS:</span><br><span class="line"></span><br><span class="line">- <span class="string">&quot;9047:9047&quot;</span></span><br><span class="line"></span><br><span class="line">- <span class="string">&quot;31010:31010&quot;</span></span><br><span class="line"></span><br><span class="line">S3:</span><br><span class="line"></span><br><span class="line">IMAGE: MINIO/MINIO</span><br><span class="line"></span><br><span class="line">ENVIRONMENT:</span><br><span class="line"></span><br><span class="line">- <span class="string">&quot;MINIO\_ACCESS\_KEY=MINIO&quot;</span></span><br><span class="line"></span><br><span class="line">- <span class="string">&quot;MINIO\_SECRET\_KEY=MINIO123&quot;</span></span><br><span class="line"></span><br><span class="line">COMMAND: SERVER /DATA --CONSOLE-ADDRESS <span class="string">&quot;:9001&quot;</span></span><br><span class="line"></span><br><span class="line">PORTS:</span><br><span class="line"></span><br><span class="line">- <span class="string">&quot;9000:9000&quot;</span></span><br><span class="line"></span><br><span class="line">- <span class="string">&quot;9001:9001&quot;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="4-2dagsHub-dvc"><a href="#4-2dagsHub-dvc" class="headerlink" title="4.2dagsHub+dvc"></a>4.2dagsHub+dvc</h2><p>创建仓库之后需要，git的命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">git clone https://dagshub.com/wsyyyyyyyy/data-storage-test.git</span><br><span class="line"></span><br><span class="line">cd data-storage-test</span><br><span class="line"></span><br><span class="line">echo &quot;# data-storage-test&quot; \&gt;\&gt; README.md</span><br><span class="line"></span><br><span class="line">git add README.md</span><br><span class="line"></span><br><span class="line">git commit -m &quot;first commit&quot;</span><br><span class="line"></span><br><span class="line">git branch -M main</span><br><span class="line"></span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
+
+<p>配置数据存储有四个选项，选择DVC存储。</p>
+<img src="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/png-1691987584599-12.png" class="" title="img">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">mkdir data</span><br><span class="line"></span><br><span class="line">echo &quot;## Data will be uploaded to this folder&quot; \&gt;\&gt; data/readme.md</span><br><span class="line"></span><br><span class="line">dvc add data/.</span><br><span class="line"></span><br><span class="line">dvc remote add origin https://dagshub.com/wsyyyyyyyy/data-storage-test.dvc</span><br><span class="line"></span><br><span class="line">dvc remote modify origin --local auth basic</span><br><span class="line"></span><br><span class="line">dvc remote modify origin --local user wsyyyyyyyy</span><br><span class="line"></span><br><span class="line">dvc remote modify origin --local password b86f657e4d58b7944411812e2f1b9f59ee562935</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m &quot;Added dvc&quot;</span><br><span class="line"></span><br><span class="line">git push</span><br><span class="line"></span><br><span class="line">dvc push -r origin</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong> ： <strong>DagsHub</strong>  <strong>不支持</strong>  <strong>DVC 3.0</strong>  <strong>及其新的哈希机制。请使用</strong>  <strong>DVC 2.x</strong></p>
+<h2 id="4-3minio-dvc"><a href="#4-3minio-dvc" class="headerlink" title="4.3minio+dvc"></a>4.3minio+dvc</h2><h3 id="minio部署"><a href="#minio部署" class="headerlink" title="minio部署"></a>minio部署</h3><p>docker创建一个节点的minio</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir minio</span><br><span class="line"></span><br><span class="line">cd minio</span><br><span class="line"></span><br><span class="line">mkdir data</span><br><span class="line"></span><br><span class="line">mkdir config</span><br></pre></td></tr></table></figure>
+
+<p>需要为minio开放两个端口，一个9000端口，一个静态端口，此处为9999</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">docker run --name minio \</span><br><span class="line"></span><br><span class="line">-p 9000:9000 \</span><br><span class="line"></span><br><span class="line">-p 9999:9999 \</span><br><span class="line"></span><br><span class="line">-d --restart=always \</span><br><span class="line"></span><br><span class="line">-e &quot;MINIO\_ROOT\_USER=admin&quot; \</span><br><span class="line"></span><br><span class="line">-e &quot;MINIO\_ROOT\_PASSWORD=admin123&quot; \</span><br><span class="line"></span><br><span class="line">-v /home/minio/data:/data \</span><br><span class="line"></span><br><span class="line">-v /home/minio/config:/root/.minio \</span><br><span class="line"></span><br><span class="line">minio/minio server /data \</span><br><span class="line"></span><br><span class="line">--console-address &#x27;0.0.0.0:9999&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>访问<a href="../text">MinIO Console</a>即可访问 admin&#x2F;admin123</p>
+<p>创建的存储桶的名称为using-dvc-for-version-management-of-data-storage</p>
+<img src="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/png-1691987627905-15.png" class="" title="img">
+
+<img src="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/png-1691987637873-18.png" class="" title="img">
+
+<p>创建访问密钥访问密钥：2HSkCcNeJB4xeuNCRf3R</p>
+<p>密钥：4a0GdZ69RUatfNGXxoamKTzVNoJ5TL8tnLKWpnYy</p>
+<p>{“url”:”<a href="http://47.93.38.210:9999/api/v1/service-account-credentials%22,%22accessKey%22:%222HSkCcNeJB4xeuNCRf3R%22,%22secretKey%22:%224a0GdZ69RUatfNGXxoamKTzVNoJ5TL8tnLKWpnYy%22,%22api%22:%22s3v4%22,%22path%22:%22auto%22%7D">http://47.93.38.210:9999/api/v1/service-account-credentials&quot;,&quot;accessKey&quot;:&quot;2HSkCcNeJB4xeuNCRf3R&quot;,&quot;secretKey&quot;:&quot;4a0GdZ69RUatfNGXxoamKTzVNoJ5TL8tnLKWpnYy&quot;,&quot;api&quot;:&quot;s3v4&quot;,&quot;path&quot;:&quot;auto&quot;}</a></p>
+<p>底层协议应该是一样的，所以可以直接调用API来进行访问</p>
+<p>参考 <a href="../text">python - 在 MinIO 存储上安装 DVC - IT工具网</a></p>
+<p><a href="../text">python - Installation DVC on MinIO storage - Stack Overflow</a></p>
+<p>在 本地安装 DVC，通过DVC来进行数据管理</p>
+<h3 id="DVC集成minio"><a href="#DVC集成minio" class="headerlink" title="DVC集成minio"></a>DVC集成minio</h3><p>首先需要安装dvc的脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install &quot;dvc[s3]&quot;</span><br></pre></td></tr></table></figure>
+
+<p>设置申请的权限配置</p>
+<p>1.设置默认远程（将”bucket名称”更改为你的minio backet）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">setup default remote (change &quot;bucket-name&quot; to your minio backet name)</span><br><span class="line">dvc remote add -d minio s3://bucket-name -f</span><br><span class="line">add information about storage url (where &quot;https://minio.mysite.com&quot; your url)</span><br><span class="line">dvc remote modify minio endpointurl https://minio.mysite.com</span><br><span class="line">add info about login and password</span><br><span class="line">dvc remote modify minio access\_key\_id my\_login</span><br><span class="line">dvc remote modify minio secret\_access\_key my\_password</span><br></pre></td></tr></table></figure>
+
+<h3 id="DVC文件操作"><a href="#DVC文件操作" class="headerlink" title="DVC文件操作"></a>DVC文件操作</h3><p>拉取文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dvc pull -r \&lt;old\_remote\_name\&gt; --all-commits --all-tags --all-branches</span><br></pre></td></tr></table></figure>
+
+<p>提交文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dvc push -r \&lt;new\_remote\_name\&gt; --all-commits --all-tags --all-branches</span><br></pre></td></tr></table></figure>
+
+<p>dvc有个问题，就是即使和git联动了，也没法在git上面透视数据，因为实际数据是存在dvc的远端存储的，git只是元数据，dagshub能很好的解决这个问题，dagshub storage可以存dvc的数据内容，所以在dagshub上面就可以直接透视数据了，可以三条路线依次去探索：</p>
+<p>1.dvc除了用dagshub透视以外有没有别的解决方案可视化dvc数据内容，最好像dagshub一样，一个类git的页面管理和可视数据</p>
+<p>2.dagshub号称开源，但是我没找到开源部署的方法，可以找找dagshub的部署方案</p>
+<p>3.寻找dagshub的开源替代品，目前来看lakeFS只是复刻了版本管理的能力，和dagshub比还是差远了</p>
+<h2 id="4-4minio-avc-rclone"><a href="#4-4minio-avc-rclone" class="headerlink" title="4.4minio+avc+rclone"></a>4.4minio+avc+rclone</h2><p>启动minio,docker-compose的配置，之前安装了可以不安装了，但是要看清是不是 Version&#x3D;3.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">version: &#x27;3&#x27;</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line"></span><br><span class="line">minio:</span><br><span class="line"></span><br><span class="line">image: minio/minio</span><br><span class="line"></span><br><span class="line">ports:</span><br><span class="line"></span><br><span class="line">- 9000:9000</span><br><span class="line"></span><br><span class="line">- 19001:19001</span><br><span class="line"></span><br><span class="line">volumes:</span><br><span class="line"></span><br><span class="line">- ./data:/data/</span><br><span class="line"></span><br><span class="line">environment:</span><br><span class="line"></span><br><span class="line">MINIO\_ACCESS\_KEY: minio</span><br><span class="line"></span><br><span class="line">MINIO\_SECRET\_KEY: minio123</span><br><span class="line"></span><br><span class="line">command: server --console-address :19001 --quiet /data</span><br></pre></td></tr></table></figure>
+
+<p>1.首先安装rclone</p>
+<p>方法一：在线安装（有权限）</p>
+<p>sudo -v ; curl <a href="https://rclone.org/install.sh">https://rclone.org/install.sh</a> | sudo bash</p>
+<p>方法二：离线安装（内网）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir ~/Temp</span><br><span class="line"></span><br><span class="line">$ cd ~/Temp/</span><br><span class="line"></span><br><span class="line">$ curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip</span><br><span class="line"></span><br><span class="line">$ unzip rclone-current-linux-amd64.zip</span><br><span class="line"></span><br><span class="line">$ cd rclone-\*-linux-amd64</span><br><span class="line"></span><br><span class="line">$ mkdir ~/bin</span><br><span class="line"></span><br><span class="line">$ cp rclone ~/bin/</span><br><span class="line"></span><br><span class="line">$ export PATH=$PATH:~/bin</span><br><span class="line"></span><br><span class="line">$ echo &#x27;export PATH=$PATH:~/bin&#x27; \&gt;\&gt; ~/.bashrc # Optional, only if you want to add it to</span><br><span class="line"></span><br><span class="line">your path at every login</span><br></pre></td></tr></table></figure>
+
+<p>2.配置rlcone，s3 环境准备好了之后就是进行rclone 的配置，通过配置一个minio s3 的就可以了，参考上边的配置，~&#x2F;.config&#x2F;rclone&#x2F;rclone.conf 可以直接拷贝复制(这里我也是本机的服务器，所以配置的是127.0.0.1，注意ip，为了配置简单，我们先把密钥暂且删掉。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[myremote]</span><br><span class="line"></span><br><span class="line">type = s3</span><br><span class="line"></span><br><span class="line">provider = Minio</span><br><span class="line"></span><br><span class="line">access\_key\_id = admin</span><br><span class="line"></span><br><span class="line">secret\_access\_key = admin123</span><br><span class="line"></span><br><span class="line">endpoint = http://127.0.0.1:9999/</span><br></pre></td></tr></table></figure>
+
+<p>然后安装artivc</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">brew tap infuseai/artivc</span><br><span class="line"></span><br><span class="line">brew install artivc</span><br></pre></td></tr></table></figure>
+
+<p>集成使用</p>
+<p>初始化工程init</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">avc init rclone://myremote/dalong/first</span><br></pre></td></tr></table></figure>
+
+<p>（这里相当于初始化之后的路径&#x2F;rclone:&#x2F;&#x2F;myremote&#x2F;&#x2F;桶的名称&#x2F;&#x2F;下面的子页面）</p>
+<p>添加文件以及push</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;testAVC&quot; \&gt; demoapp</span><br><span class="line"></span><br><span class="line">avc push</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://www.wsyssl.top">wsy</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://www.wsyssl.top/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/">https://www.wsyssl.top/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/minio/">minio</a><a class="post-meta__tags" href="/tags/dvc/">dvc</a></div><div class="post_share"><div class="social-share" data-image="https://images2.alphacoders.com/937/thumbbig-937391.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2023/08/25/Sanfor%E5%AE%9E%E4%B9%A0-%E6%95%B0%E6%8D%AE%E4%BF%A1%E9%81%93/" title="Sanfor实习-数据信道"><img class="cover" src="https://images2.alphacoders.com/939/thumbbig-939436.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-08-25</div><div class="title">Sanfor实习-数据信道</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/cat.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">wsy</div><div class="author-info__description">The future returns to the future</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><a id="card-info-btn" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/wsyyyyyyyy" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://leetcode.cn/u/phaseless/" target="_blank" title="leetcode"><i class="iconfont icon-leetcode1"></i></a><a class="social-icon" href="https://blog.csdn.net/m0_53737524?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="iconfont icon-csdn"></i></a><a class="social-icon" href="https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&amp;k=SH0NG_q3x5gOXxiLzND8PKXQR0Gl8TRY&amp;authKey=DklK56k%2BJ%2FBR%2B03qcZb4ArdzcWteVxLBc56qXw3WRzOVII65gwfEWYEG68%2FWTZrN&amp;noverify=0&amp;group_code=715091865" target="_blank" title=""><i class="fab fa-qq"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E8%B0%83%E7%A0%94"><span class="toc-number">1.</span> <span class="toc-text">大模型数据存储方案调研</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%83%8C%E6%99%AF%E5%92%8C%E9%9C%80%E6%B1%82"><span class="toc-number">2.</span> <span class="toc-text">背景和需求</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%9A%E7%95%8C%E6%96%B9%E6%A1%88"><span class="toc-number">3.</span> <span class="toc-text">业界方案</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%B7%A5%E5%85%B7%E5%AF%B9%E6%AF%94"><span class="toc-number">3.1.</span> <span class="toc-text">2.1版本控制工具对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2%E6%8C%82%E8%BD%BD%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94"><span class="toc-number">3.2.</span> <span class="toc-text">2.2挂载存储调研</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B9%E6%A1%88%E9%80%89%E5%9E%8B%E7%BB%93%E8%AE%BA"><span class="toc-number">4.</span> <span class="toc-text">方案选型结论</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="toc-number">5.</span> <span class="toc-text">测试</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1Lakefs"><span class="toc-number">5.1.</span> <span class="toc-text">4.1Lakefs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2dagsHub-dvc"><span class="toc-number">5.2.</span> <span class="toc-text">4.2dagsHub+dvc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3minio-dvc"><span class="toc-number">5.3.</span> <span class="toc-text">4.3minio+dvc</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#minio%E9%83%A8%E7%BD%B2"><span class="toc-number">5.3.1.</span> <span class="toc-text">minio部署</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DVC%E9%9B%86%E6%88%90minio"><span class="toc-number">5.3.2.</span> <span class="toc-text">DVC集成minio</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DVC%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C"><span class="toc-number">5.3.3.</span> <span class="toc-text">DVC文件操作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4minio-avc-rclone"><span class="toc-number">5.4.</span> <span class="toc-text">4.4minio+avc+rclone</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/08/27/%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%AE%9A%E6%97%B6-%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF%EF%BC%9F/" title="延时消息:如何实现高性能的定时/延时消息？"><img src="https://images.alphacoders.com/132/thumbbig-1323666.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="延时消息:如何实现高性能的定时/延时消息？"/></a><div class="content"><a class="title" href="/2023/08/27/%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%AE%9A%E6%97%B6-%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF%EF%BC%9F/" title="延时消息:如何实现高性能的定时/延时消息？">延时消息:如何实现高性能的定时/延时消息？</a><time datetime="2023-08-27T02:43:46.000Z" title="Created 2023-08-27 10:43:46">2023-08-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/" title="API网关调研报告"><img src="https://images4.alphacoders.com/937/thumbbig-937406.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="API网关调研报告"/></a><div class="content"><a class="title" href="/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/" title="API网关调研报告">API网关调研报告</a><time datetime="2023-08-25T13:18:22.000Z" title="Created 2023-08-25 21:18:22">2023-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/25/Sanfor%E5%AE%9E%E4%B9%A0-%E6%95%B0%E6%8D%AE%E4%BF%A1%E9%81%93/" title="Sanfor实习-数据信道"><img src="https://images2.alphacoders.com/939/thumbbig-939436.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Sanfor实习-数据信道"/></a><div class="content"><a class="title" href="/2023/08/25/Sanfor%E5%AE%9E%E4%B9%A0-%E6%95%B0%E6%8D%AE%E4%BF%A1%E9%81%93/" title="Sanfor实习-数据信道">Sanfor实习-数据信道</a><time datetime="2023-08-25T06:58:56.000Z" title="Created 2023-08-25 14:58:56">2023-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/17/API%E7%BD%91%E5%85%B3-%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%BC%80%E5%8F%91/" title="API网关-注册中心的设计与开发"><img src="https://images4.alphacoders.com/937/thumbbig-937402.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="API网关-注册中心的设计与开发"/></a><div class="content"><a class="title" href="/2023/08/17/API%E7%BD%91%E5%85%B3-%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%BC%80%E5%8F%91/" title="API网关-注册中心的设计与开发">API网关-注册中心的设计与开发</a><time datetime="2023-08-17T06:16:09.000Z" title="Created 2023-08-17 14:16:09">2023-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/" title="Sanfor实习-大模型数据存储调研方案"><img src="https://images2.alphacoders.com/937/thumbbig-937391.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Sanfor实习-大模型数据存储调研方案"/></a><div class="content"><a class="title" href="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/" title="Sanfor实习-大模型数据存储调研方案">Sanfor实习-大模型数据存储调研方案</a><time datetime="2023-08-14T04:26:33.000Z" title="Created 2023-08-14 12:26:33">2023-08-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By wsy</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading the Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div><hr/><div class="no-result" id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body></html>

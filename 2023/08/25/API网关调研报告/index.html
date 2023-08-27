@@ -1,0 +1,189 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>API网关调研报告 | WSYのBlog</title><meta name="author" content="wsy"><meta name="copyright" content="wsy"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="项目的选型分布式架构下选择SpringMVC不是不可行，只是不是最佳的选择，不适合微服务的架构，无法实现服务的发现和负载均衡，缺少统一的认证和鉴权，无法处理大量的请求 互联网现代分布式架构应用技术主要以 RPC 通信的微服务模型为主，代表技术如；Dubbo、gRPC、Thrift，它们的通信协议为 RPC 协议（Remote Procedure Call，远程过程调用），这样的调用方式可以提高微服">
+<meta property="og:type" content="article">
+<meta property="og:title" content="API网关调研报告">
+<meta property="og:url" content="https://www.wsyssl.top/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/index.html">
+<meta property="og:site_name" content="WSYのBlog">
+<meta property="og:description" content="项目的选型分布式架构下选择SpringMVC不是不可行，只是不是最佳的选择，不适合微服务的架构，无法实现服务的发现和负载均衡，缺少统一的认证和鉴权，无法处理大量的请求 互联网现代分布式架构应用技术主要以 RPC 通信的微服务模型为主，代表技术如；Dubbo、gRPC、Thrift，它们的通信协议为 RPC 协议（Remote Procedure Call，远程过程调用），这样的调用方式可以提高微服">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images4.alphacoders.com/937/thumbbig-937406.webp">
+<meta property="article:published_time" content="2023-08-25T13:18:22.000Z">
+<meta property="article:modified_time" content="2023-08-25T15:06:15.777Z">
+<meta property="article:author" content="wsy">
+<meta property="article:tag" content="api网关">
+<meta property="article:tag" content="微服务">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images4.alphacoders.com/937/thumbbig-937406.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://www.wsyssl.top/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'API网关调研报告',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-08-25 23:06:15'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/font.css"><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (false) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/cat.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://images4.alphacoders.com/937/thumbbig-937406.webp')"><nav id="nav"><span id="blog-info"><a href="/" title="WSYのBlog"><span class="site-name">WSYのBlog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">API网关调研报告</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-08-25T13:18:22.000Z" title="Created 2023-08-25 21:18:22">2023-08-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-08-25T15:06:15.777Z" title="Updated 2023-08-25 23:06:15">2023-08-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%A1%B9%E7%9B%AE/">项目</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">1.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>4min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="API网关调研报告"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="项目的选型"><a href="#项目的选型" class="headerlink" title="项目的选型"></a>项目的选型</h2><p>分布式架构下选择SpringMVC不是不可行，只是不是最佳的选择，不适合微服务的架构，无法实现服务的发现和负载均衡，缺少统一的认证和鉴权，无法处理大量的请求</p>
+<p>互联网现代分布式架构应用技术主要以 RPC 通信的微服务模型为主，代表技术如；Dubbo、gRPC、Thrift，它们的通信协议为 RPC 协议（Remote Procedure Call，远程过程调用），这样的调用方式可以提高微服务间的通信性能。</p>
+<p>介绍你的项目一句话概括：</p>
+<p>它可以通过RPC服务的注册和发现机制，把接口注册网关中心，再通过网关算力执行接收 HTTP 请求协议进行解析做 RPC 接口的泛化调用。</p>
+<img src="/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/image-20230825214200979.png" class="" title="image-20230825214200979">
+
+<p>一 SpringGateWay和API网关的区别：</p>
+<p>1.Spring Cloud 网关和此项目 API 网关的不同之处在于它们服务的范围和实现方式，Spring Cloud网关服务于微服务架构中的服务治理，而API网关则服务于分布式系统中的RPC调用管理。 </p>
+<p>1.1 功能特点： Spring Cloud网关是一种微服务网关技术，它主要提供路由、限流、鉴权、负载均衡等基本功能，通过Spring Cloud Gateway等组件来实现。相比于API网关，它更加专注于处理微服务之间的HTTP通信问题。 API网关则是一种面向API接口的网关技术，它可以提供API管理、鉴权、熔断、限流、路由等各类所需自行扩展的功能。相比于Spring Cloud网关，API网关更加适用于更适合使用各类RPC通信的大型微服务分布式系统架构。在中大型有自研能力的互联网公司用途广泛，包括；字节、阿里、京东、美团、滴滴等。 </p>
+<p>1.2 技术架构： Spring Cloud网关使用Spring Cloud Gateway等微服务框架组件来实现，通常采用Java语言进行开发。API 网关则使用Java、Netty、RPC、GRPC等技术实现，可以使用多种语言进行开发，如Java、Go等，自主扩展性强。 </p>
+<p>2.如果使用我们套API网关，首先是你们的服务有一定的体量规模，微服务较多，RPC使用频繁。需要对 RPC 接口到 HTTP 的转换进行统一管理和对外发布 HTTP 协议接口。那么可以使用。使用时，看是那套 RPC 如果是 Dubbo 那么我们正好已经开发，只需要简单配置即可使用。但前提是需要在你们公司部署一套我们的 API网关系统。</p>
+<p>二 ZK和网关的注册中心的区别：</p>
+<p>RPC 注册中心是 RPC 一套体系的内容，与网关不是一个注册中心。网关维护的是网关算力和 RPC 注册服务的连接分配以及服务发现等功能，都是给网关使用的。但 RPC 不一定都是 Dubbo 还可能是其他的，这与网关是分开的，任何一个RPC泛化调用都可以被配置到网关中使用.</p>
+<p>三 池化和路由策略</p>
+<p>连接的引入是希望可复用 RPC 链接，以避免每个请求都要重新建立连接的开销。有点像数据库的连接池一样路由策略体现在 API 网关的调用上，可以进行PIN 哈希路由做切量处理。</p>
+<p>四 网关如何实现高可用</p>
+<p>部署多个实例 监控与自动恢复 调用RPC失败重传 网管相当于只是协议转发 如果失败重新配置超时和重试的机制</p>
+<p>五 API网关的性能瓶颈在哪</p>
+<p>API网关主要的通信都在Core核心层，其他动作都是讲接口拉取下来后做映射操作，不消耗性能。最终的性能体现就是在接收 HTTP请求 -&gt;协议转换 -&gt; 验证-&gt;获取映射接口-&gt; 泛化调用，这条链路上。所以可能发生的瓶颈点为;<br>1.网络I&#x2F;0性能:如果网关处理不当，会导致请求堆积、响应延迟等问题。可以通过优化网络I&#x2F;0的方式来提高系统的性能，例如使用 Netty 的异步非阻塞模型，使用季拷贝技术等。<br>2.Dubbo服务性能: API 网关的主要作用是将 HTTP 请求转换为 Dubbo 泛化调用，因此 Dubbo 服务的性能也是个关键因素。如果 Dubbo 服务本身存在性能问题，会导致 API 网关的性能下降。可以通过优化 Dubbo 服务的方式来提高系统的性能，例如使用 Dubbo 的异步调用、负载均衡分布式部多套]等.<br>3.线程池性能:API 网关需要处理大量的请求，因此线程池的性能也是一个关键因素。如果线程池的参数设置不合理，会导致线程池过度消耗 CPU、内存等资源，从而影响系统的性能。可以通过优化线程池的方式来提高系统的性能，例如设置合理的线程池大小、队列长度、拒绝策略等。[尽量要做到快速释放，超时四时间需要设置好]<br>4.内存使用:API 网关需要维护大量的连接和请求，因此内存使用也是一个关键因素。如果内存使用不当，会导致内存泄漏、内存溢出等问题，从而影响系统的性能。可以通过优化内存使用的方式来提高系统的性能，例如使用内存池、避免创建过多的对象等。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://www.wsyssl.top">wsy</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://www.wsyssl.top/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/">https://www.wsyssl.top/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/api%E7%BD%91%E5%85%B3/">api网关</a><a class="post-meta__tags" href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a></div><div class="post_share"><div class="social-share" data-image="https://images4.alphacoders.com/937/thumbbig-937406.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2023/08/17/API%E7%BD%91%E5%85%B3-%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%BC%80%E5%8F%91/" title="API网关-注册中心的设计与开发"><img class="cover" src="https://images4.alphacoders.com/937/thumbbig-937402.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-08-17</div><div class="title">API网关-注册中心的设计与开发</div></div></a></div><div><a href="/2023/08/10/API%E7%BD%91%E5%85%B3-%E7%BD%91%E5%85%B3%E6%A0%B8%E5%BF%83%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%BC%80%E5%8F%91/" title="API网关-网关核心系统设计与开发"><img class="cover" src="https://images8.alphacoders.com/939/thumbbig-939448.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-08-10</div><div class="title">API网关-网关核心系统设计与开发</div></div></a></div><div><a href="/2023/08/27/%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%AE%9A%E6%97%B6-%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF%EF%BC%9F/" title="延时消息:如何实现高性能的定时&#x2F;延时消息？"><img class="cover" src="https://images.alphacoders.com/132/thumbbig-1323666.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-08-27</div><div class="title">延时消息:如何实现高性能的定时&#x2F;延时消息？</div></div></a></div><div><a href="/2022/12/20/%E8%87%AA%E7%A0%94%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E5%85%B3-%E6%8A%80%E6%9C%AF%E9%80%89%E5%9E%8B-%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" title="自研高性能网关-技术选型-架构设计"><img class="cover" src="https://images4.alphacoders.com/937/thumbbig-937402.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-20</div><div class="title">自研高性能网关-技术选型-架构设计</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/cat.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">wsy</div><div class="author-info__description">The future returns to the future</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><a id="card-info-btn" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/wsyyyyyyyy" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://leetcode.cn/u/phaseless/" target="_blank" title="leetcode"><i class="iconfont icon-leetcode1"></i></a><a class="social-icon" href="https://blog.csdn.net/m0_53737524?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="iconfont icon-csdn"></i></a><a class="social-icon" href="https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&amp;k=SH0NG_q3x5gOXxiLzND8PKXQR0Gl8TRY&amp;authKey=DklK56k%2BJ%2FBR%2B03qcZb4ArdzcWteVxLBc56qXw3WRzOVII65gwfEWYEG68%2FWTZrN&amp;noverify=0&amp;group_code=715091865" target="_blank" title=""><i class="fab fa-qq"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E7%9A%84%E9%80%89%E5%9E%8B"><span class="toc-number">1.</span> <span class="toc-text">项目的选型</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/08/27/%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%AE%9A%E6%97%B6-%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF%EF%BC%9F/" title="延时消息:如何实现高性能的定时/延时消息？"><img src="https://images.alphacoders.com/132/thumbbig-1323666.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="延时消息:如何实现高性能的定时/延时消息？"/></a><div class="content"><a class="title" href="/2023/08/27/%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%AE%9A%E6%97%B6-%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF%EF%BC%9F/" title="延时消息:如何实现高性能的定时/延时消息？">延时消息:如何实现高性能的定时/延时消息？</a><time datetime="2023-08-27T02:43:46.000Z" title="Created 2023-08-27 10:43:46">2023-08-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/" title="API网关调研报告"><img src="https://images4.alphacoders.com/937/thumbbig-937406.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="API网关调研报告"/></a><div class="content"><a class="title" href="/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/" title="API网关调研报告">API网关调研报告</a><time datetime="2023-08-25T13:18:22.000Z" title="Created 2023-08-25 21:18:22">2023-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/25/Sanfor%E5%AE%9E%E4%B9%A0-%E6%95%B0%E6%8D%AE%E4%BF%A1%E9%81%93/" title="Sanfor实习-数据信道"><img src="https://images2.alphacoders.com/939/thumbbig-939436.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Sanfor实习-数据信道"/></a><div class="content"><a class="title" href="/2023/08/25/Sanfor%E5%AE%9E%E4%B9%A0-%E6%95%B0%E6%8D%AE%E4%BF%A1%E9%81%93/" title="Sanfor实习-数据信道">Sanfor实习-数据信道</a><time datetime="2023-08-25T06:58:56.000Z" title="Created 2023-08-25 14:58:56">2023-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/17/API%E7%BD%91%E5%85%B3-%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%BC%80%E5%8F%91/" title="API网关-注册中心的设计与开发"><img src="https://images4.alphacoders.com/937/thumbbig-937402.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="API网关-注册中心的设计与开发"/></a><div class="content"><a class="title" href="/2023/08/17/API%E7%BD%91%E5%85%B3-%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%BC%80%E5%8F%91/" title="API网关-注册中心的设计与开发">API网关-注册中心的设计与开发</a><time datetime="2023-08-17T06:16:09.000Z" title="Created 2023-08-17 14:16:09">2023-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/" title="Sanfor实习-大模型数据存储调研方案"><img src="https://images2.alphacoders.com/937/thumbbig-937391.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Sanfor实习-大模型数据存储调研方案"/></a><div class="content"><a class="title" href="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/" title="Sanfor实习-大模型数据存储调研方案">Sanfor实习-大模型数据存储调研方案</a><time datetime="2023-08-14T04:26:33.000Z" title="Created 2023-08-14 12:26:33">2023-08-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By wsy</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading the Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div><hr/><div class="no-result" id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body></html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>项目部署-jvm调优 | WSYのBlog</title><meta name="author" content="wsy"><meta name="copyright" content="wsy"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="部署上线前准备 索引 开发完成后，到了上线环节，需要检查mysql的索引是否设置合理，如果后续数据量多了在设置索引，那么用时会比较长，需要进行停机维护，造成不好的用户体验  合理设置索引，可以有效的提高查询性能 索引的设计原则：  每个表都必须有自增主键 有顺序，磁盘顺序读写 速度快 插入数据的时候，会插入到最后（B+Tree结构），减少了数据移动 减少页分裂（B+Tree结构）   常做为查询条">
+<meta property="og:type" content="article">
+<meta property="og:title" content="项目部署-jvm调优">
+<meta property="og:url" content="https://www.wsyssl.top/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/index.html">
+<meta property="og:site_name" content="WSYのBlog">
+<meta property="og:description" content="部署上线前准备 索引 开发完成后，到了上线环节，需要检查mysql的索引是否设置合理，如果后续数据量多了在设置索引，那么用时会比较长，需要进行停机维护，造成不好的用户体验  合理设置索引，可以有效的提高查询性能 索引的设计原则：  每个表都必须有自增主键 有顺序，磁盘顺序读写 速度快 插入数据的时候，会插入到最后（B+Tree结构），减少了数据移动 减少页分裂（B+Tree结构）   常做为查询条">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images8.alphacoders.com/131/thumbbig-1319479.webp">
+<meta property="article:published_time" content="2023-02-01T11:25:37.000Z">
+<meta property="article:modified_time" content="2023-08-08T11:31:16.074Z">
+<meta property="article:author" content="wsy">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images8.alphacoders.com/131/thumbbig-1319479.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://www.wsyssl.top/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '项目部署-jvm调优',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-08-08 19:31:16'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/font.css"><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (false) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/cat.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://images8.alphacoders.com/131/thumbbig-1319479.webp')"><nav id="nav"><span id="blog-info"><a href="/" title="WSYのBlog"><span class="site-name">WSYのBlog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">项目部署-jvm调优</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-02-01T11:25:37.000Z" title="Created 2023-02-01 19:25:37">2023-02-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-08-08T11:31:16.074Z" title="Updated 2023-08-08 19:31:16">2023-08-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%A1%B9%E7%9B%AE/">项目</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%BC%96%E7%A8%8B%E5%9F%BA%E6%9C%AC%E5%8A%9F/">编程基本功</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">6.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>25min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="项目部署-jvm调优"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>部署上线前准备</p>
+<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><blockquote>
+<p>开发完成后，到了上线环节，需要检查mysql的索引是否设置合理，如果后续数据量多了在设置索引，那么用时会比较长，需要进行停机维护，造成不好的用户体验</p>
+</blockquote>
+<p><strong>合理设置索引，可以有效的提高查询性能</strong></p>
+<p>索引的设计原则：</p>
+<ol>
+<li>每个表都必须有<code>自增主键</code><ol>
+<li>有顺序，磁盘顺序读写 速度快</li>
+<li>插入数据的时候，会插入到最后（B+Tree结构），减少了数据移动</li>
+<li>减少页分裂（B+Tree结构）</li>
+</ol>
+</li>
+<li>常做为<code>查询条件</code>的字段，<code>排序</code>，<code>分组</code>的字段建立索引<ol>
+<li>提高查询效率</li>
+</ol>
+</li>
+<li>索引字段的选择尽量不使用 <code>字段长度较长</code>的</li>
+<li>数据量小的表 不建立索引</li>
+<li>限制索引的数量 不是越多越好 （通常建议在6个以内）</li>
+<li>写比多，并且写频繁的表不建议加索引</li>
+<li>不要在<code>区分度低</code>的字段建立索引<ol>
+<li>比如性别，只有 男 女 未知 三个值，索引完全起不到优化作用</li>
+</ol>
+</li>
+<li>联合索引的创建要符合<code>最左原则</code><ol>
+<li>遇到范围查询 索引失效</li>
+<li>比如：a &#x3D; 1 and b &#x3D; 2 and c &gt; 3 and d &#x3D; 4，如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。</li>
+<li>比如: a &#x3D; 1 and b &gt; 3 and c &lt; 4 , 我们可以对(a,b) 或者（a,c）建索引，都可以，如何选择，可以看 b和c谁的区分度高</li>
+</ol>
+</li>
+</ol>
+<h2 id="mysql数据页"><a href="#mysql数据页" class="headerlink" title="mysql数据页"></a>mysql数据页</h2><blockquote>
+<p>InnoDB从磁盘中读取数据的最小单位是数据页。而你想得到的id &#x3D; xxx的数据，就是这个数据页众多行中的一行。</p>
+</blockquote>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/1496926-20201126113029931-1621355504.png" class="" title="img">
+
+<blockquote>
+<p>在InnoDB存储引擎中，数据页是InnoDB磁盘管理的最小的数据单位，<code>数据页的默认大小为16KB</code>。</p>
+</blockquote>
+<p>在MySQL5.6中：你可以通过参数<code>innodb_page_size</code>设置每个数据页的大小为4KB、8KB、16KB。一旦设置完成后，所有表中的数据页大小都将是你设置的值且不可变。不论你将<code>innodb_page_size</code>设置成多大，一个区（extent）1MB的事实都不会改变。</p>
+<p>在MySQL5.7.6中：允许你将<code>innodb_page_size</code>  设置成 32KB、64KB大小。对于32KB大小的数据页来说区的大小被调整成2MB。对于64KB大小的数据页来说，区的大小被调整成4MB。</p>
+<h2 id="数据区"><a href="#数据区" class="headerlink" title="数据区"></a>数据区</h2><blockquote>
+<p>在MySQL的设定中，同一个表空间内的一组连续的数据页为一个extent（区），默认区的大小为1MB，页的大小为16KB。16*64&#x3D;1024，也就是说一个区里面会有64个连续的数据页。连续的256个数据区为一组数据区。</p>
+</blockquote>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/1496926-20201126113030834-1060222235.jpg" class="" title="img">
+
+
+
+<h2 id="B-TREE和B-TREE"><a href="#B-TREE和B-TREE" class="headerlink" title="B-TREE和B+TREE"></a>B-TREE和B+TREE</h2><ol>
+<li><p>B-Tree(读B树,中间是连接符，不是减号)</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/20160202204827368" class="" title="B-Tree">
+
+<blockquote>
+<p>以根节点为例，关键字为17和35，P1指针指向的子树的数据范围为小于17，P2指针指向的子树的数据范围为17~35，P3指针指向的子树的数据范围为大于35</p>
+</blockquote>
+<p>模拟查找关键字29的过程：</p>
+<ol>
+<li>根据根节点找到磁盘块1，读入内存。【磁盘I&#x2F;O操作第1次】</li>
+<li>比较关键字29在区间（17,35），找到磁盘块1的指针P2。</li>
+<li>根据P2指针找到磁盘块3，读入内存。【磁盘I&#x2F;O操作第2次】</li>
+<li>比较关键字29在区间（26,30），找到磁盘块3的指针P2。</li>
+<li>根据P2指针找到磁盘块8，读入内存。【磁盘I&#x2F;O操作第3次】</li>
+<li>在磁盘块8中的关键字列表中找到关键字29。</li>
+</ol>
+<p><strong>分析上面过程，发现需要3次磁盘I&#x2F;O操作，和3次内存查找操作。</strong></p>
+</li>
+<li><p>B+Tree</p>
+<blockquote>
+<p>B+Tree是在B-Tree基础上的一种优化，使其更适合实现外存储索引结构，InnoDB存储引擎就是用B+Tree实现其索引结构。</p>
+</blockquote>
+<p><strong>B+Tree相对于B-Tree有几点不同：</strong></p>
+<ol>
+<li>非叶子节点只存储键值信息。</li>
+<li>所有叶子节点之间都有一个链指针。</li>
+<li>数据记录都存放在叶子节点中。</li>
+</ol>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/20160202205105560" class="" title="B+Tree">
+</li>
+<li><p>由于非叶子节点不存储数据，所以可以存储大量的键，树的深度会减少，代表会进行较少的磁盘IO</p>
+</li>
+<li><p>叶子节点使用链表，能够很好的支持范围查询</p>
+</li>
+<li><p>充分利用空间局部性原理，适合磁盘存储</p>
+<ol>
+<li>磁盘IO是一个比较耗时的操作，而操作系统在设计时则定义一个空间局部性原则，局部性原理是指CPU访问存储器时，<strong>无论是存取指令还是存取数据，所访问的存储单元都趋于聚集在一个较小的连续区域中</strong>。</li>
+<li>操作系统的文件系统中，数据也是按照page划分的，一般为4k或8k。<strong>当计算机访问一个地址数据时，不仅会加载当前数据所在的数据页，还会将当前数据页相邻的数据页一同加载到内存</strong>。而这个过程实际上只发生了1次磁盘IO，这个理论对于索引的数据结构设计非常有帮助。</li>
+</ol>
+</li>
+</ol>
+<h2 id="数据页分裂问题"><a href="#数据页分裂问题" class="headerlink" title="数据页分裂问题"></a>数据页分裂问题</h2><blockquote>
+<p>假设你现在已经有两个数据页了。并且你正在往第二个数据页中写数据。</p>
+</blockquote>
+<p><strong>假设你自定义了主键索引，而且你自定义的这个主键索引并不一定是自增的</strong></p>
+<p>会出现如下情况：</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/1496926-20201126113031695-1349347128.png" class="" title="img">
+
+<blockquote>
+<p>随着你将数据写入。就导致<code>后一个数据页中的所有行并不一定比前一个数据页中的行的id大</code>。</p>
+</blockquote>
+<p><strong>这时就会触发页分裂的逻辑</strong></p>
+<p>页分裂的目的就是保证：<code>后一个数据页中的所有行主键值比前一个数据页中主键值大。</code></p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/1496926-20201126113032271-1519023118.png" class="" title="img">
+
+<blockquote>
+<p>如果使用主键索引，就会减少页分裂</p>
+</blockquote>
+<h1 id="JVM调优"><a href="#JVM调优" class="headerlink" title="JVM调优"></a>JVM调优</h1><blockquote>
+<p>上线之前，需要预估系统的访问量，设置合理的JVM参数</p>
+</blockquote>
+<h2 id="分代回收"><a href="#分代回收" class="headerlink" title="分代回收"></a>分代回收</h2><blockquote>
+<p>首先我们需要明白，JVM是在内存当中的，我们程序运行的过程当中，会持续的在内存中占用空间，有些对象使用完成之后，就不会在被使用了，那么应该被回收掉，释放内存空间，保证程序的运行。</p>
+</blockquote>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/1312707-20200313093242807-162444051.png" class="" title="img">
+
+<ol>
+<li><p>年轻代（新生代）</p>
+<blockquote>
+<p>新生代主要用来存放新生的对象。一般占据堆空间的1&#x2F;3。在新生代中，保存着大量的刚刚创建的对象，但是大部分的对象都是朝生夕死，所以在新生代中会频繁的进行<code>MinorGC</code>，进行垃圾回收。新生代又细分为三个区：<code>Eden区</code>、<code>SurvivorFrom</code>、<code>ServivorTo</code>区，三个区的默认比例为：8：1：1。</p>
+</blockquote>
+<ol>
+<li><p><strong>Eden区</strong></p>
+<blockquote>
+<p>Java<code>新创建的对象</code>绝大部分会分配在Eden区（如果对象太大，则直接分配到老年代）。当Eden区内存不够的时候，就会触发<code>MinorGC</code>（新生代采用的是<code>复制算法</code>），对新生代进行一次垃圾回收。</p>
+</blockquote>
+</li>
+<li><p><strong>SurvivorFrom区和To区</strong></p>
+<blockquote>
+<p>在GC开始的时候，对象只会存在于Eden区和名为<code>From的Survivor区</code>，To区是空的，一次MinorGc过后，<code>Eden区和SurvivorFrom区存活的对象会移动到SurvivorTo区中</code>，然后会<code>清空Eden区和SurvivorFrom区</code>，并对存活的对象的<code>年龄+1</code>，如果对象的年龄达到<code>15</code>，则直接分配到<code>老年代</code>。MinorGC完成后，SurvivorFrom区和SurvivorTo区的功能进行互换。下一次MinorGC时，会把SurvivorTo区和Eden区存活的对象放入SurvivorFrom区中，并计算对象存活的年龄。</p>
+</blockquote>
+</li>
+</ol>
+</li>
+<li><p>老年代</p>
+<blockquote>
+<p>​	老年代主要存放应用中生命周期长的内存对象。老年代比较稳定，<code>不会频繁的进行MajorGC</code>。而在<code>MaiorGC之前才会先进行一次MinorGC</code>，使得新生的对象进入老年代而导致空间不够才会触发。当无法找到足够大的连续空间分配给新创建的较大对象也会提前触发一次MajorGC进行垃圾回收腾出空间。</p>
+<p>　　在老年代中，MajorGC采用了<code>标记—清除算法</code>：首先扫描一次所有老年代里的对象，标记出存活的对象，然后回收没有标记的对象。<code>MajorGC的耗时比较长</code>。因为要扫描再回收。<code>MajorGC会产生内存碎片</code>，当老年代也没有内存分配给新来的对象的时候，就会抛出<code>OOM（Out of Memory）</code>异常。</p>
+</blockquote>
+</li>
+<li><p>永久代</p>
+<blockquote>
+<p>永久代指的是永久保存区域。</p>
+<p>主要存放<code>Class和Meta（元数据）</code>的信息。</p>
+<p>Classic在被加载的时候被放入永久区域，它和存放的实例的区域不同，在Java8中，永久代已经被移除，取而代之的是一个称之为“元数据区”（<code>元空间</code>）的区域。</p>
+<p>元空间和永久代类似，都是对JVM中规范中方法的实现。不过元空间与永久代之间最大的区别在于：<code>元空间并不在虚拟机中，而是使用本地内存</code>。因此，默认情况下，元空间的大小仅受本地内存的限制。类的元数据放入native memory，字符串池和类的静态变量放入java堆中。这样可以加载多少类的元数据就不再由MaxPermSize控制，而由系统的实际可用空间来控制。</p>
+<p>采用元空间而不用永久代的原因：</p>
+<ul>
+<li>为了解决永久代的OOM问题，元数据和class对象存放在永久代中，容易出现性能问题和内存溢出。</li>
+<li>类及方法的信息等比较难确定其大小，因此对于永久代大小指定比较困难，大小容易出现永久代溢出，太大容易导致老年代溢出（堆内存不变，此消彼长）。</li>
+<li>永久代会为GC带来不必要的复杂度，并且回收效率偏低。</li>
+</ul>
+</blockquote>
+</li>
+</ol>
+<h2 id="FullGC"><a href="#FullGC" class="headerlink" title="FullGC"></a>FullGC</h2><p>MinorGC: 年轻代回收</p>
+<p>Major GC：老年代回收</p>
+<p>FullGC：年轻代，老年代，永久代都回收 </p>
+<p>触发FullGC的条件：</p>
+<ol>
+<li>System.gc()</li>
+<li>老年代空间不足</li>
+<li>永久代空间不足</li>
+<li>gc担保失败，进行MinorGC之前会检查老年代是否有足够的连续空间大于平均历次晋升到老年代大小，如果小于 则进行FullGC</li>
+</ol>
+<p><strong>调优的目的是尽量少的发生fullGC，FullGC会发生STW（世界停顿），影响系统性能</strong></p>
+<h2 id="如何确定参数"><a href="#如何确定参数" class="headerlink" title="如何确定参数"></a>如何确定参数</h2><blockquote>
+<p>JVM最优的参数，最好是在应用上线前就确定好，我们首先预估单机应用需要能承载的最大量级，然后进行压测，根据日志来进行调优</p>
+</blockquote>
+<h3 id="项目部署到虚拟机"><a href="#项目部署到虚拟机" class="headerlink" title="项目部署到虚拟机"></a>项目部署到虚拟机</h3><blockquote>
+<p>我们克隆一个虚拟机，将其中的部署软件都清空，部署springboot程序上去</p>
+</blockquote>
+<p>做一个新的配置文件，application-prod.properties，将其中的数据库，redis，等连接修改一下</p>
+<ol>
+<li><p>打包</p>
+<p>在api的模块依赖加入maven打包插件</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-resources-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果选择连本机数据库，记得开启允许所有ip访问</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> mysql.user <span class="keyword">set</span> host <span class="operator">=</span> <span class="string">&#x27;%&#x27;</span> <span class="keyword">where</span> <span class="keyword">user</span> <span class="operator">=</span><span class="string">&#x27;root&#x27;</span>;</span><br><span class="line">flush privilege;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在虚拟机上创建目录，并将sso，web，sso-provider这些jar包上传</p>
+</li>
+<li><p>创建启动脚本 并 chmod +x sso-api.sh</p>
+<p>sso-api.sh</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">这里可替换为你自己的执行程序，其他代码无需更改</span></span><br><span class="line">APP_NAME=sso-api.jar</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">使用说明，用来提示输入参数</span></span><br><span class="line">usage() &#123;</span><br><span class="line">    echo &quot;Usage: sh demo.sh [start|stop|restart|status]&quot;</span><br><span class="line">    exit 1</span><br><span class="line">&#125;       </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">检查程序是否在运行</span></span><br><span class="line">is_exist() &#123; </span><br><span class="line">     pid=`ps -ef | grep $APP_NAME | grep -v grep | awk &#x27;&#123;print $2&#125;&#x27; `</span><br><span class="line">     echo &quot;pid==$&#123;pid&#125;&quot;</span><br><span class="line">     #如果不存在返回1，存在返回0</span><br><span class="line">     if [ -z &quot;$&#123;pid&#125;&quot; ]; then</span><br><span class="line">     		echo &#x27;不存在，没有启动,准备启动&#x27;</span><br><span class="line">             return 1</span><br><span class="line">        else</span><br><span class="line">             return 0</span><br><span class="line">        fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">启动方法</span></span><br><span class="line">start() &#123;</span><br><span class="line">    echo &quot;*********check is_exist in first*****&quot;</span><br><span class="line">    is_exist</span><br><span class="line">    if [ $? -eq &quot;0&quot; ]; then</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; is already running. pid=$&#123;pid&#125; .&quot;</span><br><span class="line">       kill $pid</span><br><span class="line">       sleep 5s</span><br><span class="line">       kill -9 $pid</span><br><span class="line">       echo &quot;kill pid &quot; $pid</span><br><span class="line">    else</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; 开始启动.... .&quot;  </span><br><span class="line">       nohup java -jar -Xmx512m -Xms512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=sso.dump  -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:sso-api.gc $APP_NAME --spring.profiles.active=prod &gt; sso.log 2&gt;&amp;1 &amp;</span><br><span class="line">       echo &quot;启动完成&quot;</span><br><span class="line">                 </span><br><span class="line">       fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">停止方法</span></span><br><span class="line">  stop() &#123;</span><br><span class="line">      is_exist</span><br><span class="line">      if [ $? -eq &quot;0&quot; ]; then</span><br><span class="line">           kill -9 $pid</span><br><span class="line">      else</span><br><span class="line">           echo &quot;$&#123;APP_NAME&#125; is not running&quot;</span><br><span class="line">      fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">输出运行状态</span></span><br><span class="line">status() &#123;</span><br><span class="line">    is_exist</span><br><span class="line">    if [ $? -eq &quot;0&quot; ]; then</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; is running. Pid is $&#123;pid&#125;&quot;</span><br><span class="line">    else</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; is not running.&quot;</span><br><span class="line">    fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">重启</span></span><br><span class="line">restart() &#123;</span><br><span class="line">   stop</span><br><span class="line">   start</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">根据输入参数，选择执行对应方法，不输入则执行使用说明</span></span><br><span class="line">case &quot;$1&quot; in</span><br><span class="line">     &quot;start&quot;)</span><br><span class="line">     start</span><br><span class="line">     ;;</span><br><span class="line">     &quot;stop&quot;)</span><br><span class="line">     stop</span><br><span class="line">     ;;</span><br><span class="line">     &quot;status&quot;)</span><br><span class="line">     status</span><br><span class="line">     ;;</span><br><span class="line">     &quot;restart&quot;)</span><br><span class="line">     restart</span><br><span class="line">     ;;</span><br><span class="line">     *)</span><br><span class="line">     usage</span><br><span class="line">     ;;</span><br><span class="line">esac       </span><br><span class="line">	   </span><br></pre></td></tr></table></figure>
+
+<p>sso-provider.sh:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">这里可替换为你自己的执行程序，其他代码无需更改</span></span><br><span class="line">APP_NAME=sso-provider.jar</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">使用说明，用来提示输入参数</span></span><br><span class="line">usage() &#123;</span><br><span class="line">    echo &quot;Usage: sh demo.sh [start|stop|restart|status]&quot;</span><br><span class="line">    exit 1</span><br><span class="line">&#125;       </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">检查程序是否在运行</span></span><br><span class="line">is_exist() &#123; </span><br><span class="line">     pid=`ps -ef | grep $APP_NAME | grep -v grep | awk &#x27;&#123;print $2&#125;&#x27; `</span><br><span class="line">     echo &quot;pid==$&#123;pid&#125;&quot;</span><br><span class="line">     #如果不存在返回1，存在返回0</span><br><span class="line">     if [ -z &quot;$&#123;pid&#125;&quot; ]; then</span><br><span class="line">     		echo &#x27;不存在，没有启动,准备启动&#x27;</span><br><span class="line">             return 1</span><br><span class="line">        else</span><br><span class="line">             return 0</span><br><span class="line">        fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">启动方法</span></span><br><span class="line">start() &#123;</span><br><span class="line">    echo &quot;*********check is_exist in first*****&quot;</span><br><span class="line">    is_exist</span><br><span class="line">    if [ $? -eq &quot;0&quot; ]; then</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; is already running. pid=$&#123;pid&#125; .&quot;</span><br><span class="line">       kill $pid</span><br><span class="line">       sleep 5s</span><br><span class="line">       kill -9 $pid</span><br><span class="line">       echo &quot;kill pid &quot; $pid</span><br><span class="line">    else</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; 开始启动 .&quot;  </span><br><span class="line">       nohup java -jar -Xmx512m -Xms512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=sso-provider.dump  -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:sso-provider.gc $APP_NAME --spring.profiles.active=prod &gt; sso-provider.log 2&gt;&amp;1 &amp;</span><br><span class="line">       echo &quot;启动完成&quot;</span><br><span class="line">                 </span><br><span class="line">       fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">停止方法</span></span><br><span class="line">  stop() &#123;</span><br><span class="line">      is_exist</span><br><span class="line">      if [ $? -eq &quot;0&quot; ]; then</span><br><span class="line">           kill -9 $pid</span><br><span class="line">      else</span><br><span class="line">           echo &quot;$&#123;APP_NAME&#125; is not running&quot;</span><br><span class="line">      fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">输出运行状态</span></span><br><span class="line">status() &#123;</span><br><span class="line">    is_exist</span><br><span class="line">    if [ $? -eq &quot;0&quot; ]; then</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; is running. Pid is $&#123;pid&#125;&quot;</span><br><span class="line">    else</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; is not running.&quot;</span><br><span class="line">    fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">重启</span></span><br><span class="line">restart() &#123;</span><br><span class="line">   stop</span><br><span class="line">   start</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">根据输入参数，选择执行对应方法，不输入则执行使用说明</span></span><br><span class="line">case &quot;$1&quot; in</span><br><span class="line">     &quot;start&quot;)</span><br><span class="line">     start</span><br><span class="line">     ;;</span><br><span class="line">     &quot;stop&quot;)</span><br><span class="line">     stop</span><br><span class="line">     ;;</span><br><span class="line">     &quot;status&quot;)</span><br><span class="line">     status</span><br><span class="line">     ;;</span><br><span class="line">     &quot;restart&quot;)</span><br><span class="line">     restart</span><br><span class="line">     ;;</span><br><span class="line">     *)</span><br><span class="line">     usage</span><br><span class="line">     ;;</span><br><span class="line">esac       </span><br><span class="line">	   </span><br></pre></td></tr></table></figure>
+
+<p>web-api.sh:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">这里可替换为你自己的执行程序，其他代码无需更改</span></span><br><span class="line">APP_NAME=web-api.jar</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">使用说明，用来提示输入参数</span></span><br><span class="line">usage() &#123;</span><br><span class="line">    echo &quot;Usage: sh demo.sh [start|stop|restart|status]&quot;</span><br><span class="line">    exit 1</span><br><span class="line">&#125;       </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">检查程序是否在运行</span></span><br><span class="line">is_exist() &#123; </span><br><span class="line">     pid=`ps -ef | grep $APP_NAME | grep -v grep | awk &#x27;&#123;print $2&#125;&#x27; `</span><br><span class="line">     echo &quot;pid==$&#123;pid&#125;&quot;</span><br><span class="line">     #如果不存在返回1，存在返回0</span><br><span class="line">     if [ -z &quot;$&#123;pid&#125;&quot; ]; then</span><br><span class="line">     		echo &#x27;不存在，没有启动,准备启动&#x27;</span><br><span class="line">             return 1</span><br><span class="line">        else</span><br><span class="line">             return 0</span><br><span class="line">        fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">启动方法</span></span><br><span class="line">start() &#123;</span><br><span class="line">    echo &quot;*********check is_exist in first*****&quot;</span><br><span class="line">    is_exist</span><br><span class="line">    if [ $? -eq &quot;0&quot; ]; then</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; is already running. pid=$&#123;pid&#125; .&quot;</span><br><span class="line">       kill $pid</span><br><span class="line">       sleep 5s</span><br><span class="line">       kill -9 $pid</span><br><span class="line">       echo &quot;kill pid &quot; $pid</span><br><span class="line">    else</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; 开始启动 .&quot;  </span><br><span class="line">       nohup java -jar -Xmx512m -Xms512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=web-api.dump  -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:web-api.gc $APP_NAME --spring.profiles.active=prod &gt; web-api.log 2&gt;&amp;1 &amp;</span><br><span class="line">       echo &quot;启动完成&quot;</span><br><span class="line">                 </span><br><span class="line">       fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">停止方法</span></span><br><span class="line">  stop() &#123;</span><br><span class="line">      is_exist</span><br><span class="line">      if [ $? -eq &quot;0&quot; ]; then</span><br><span class="line">           kill -9 $pid</span><br><span class="line">      else</span><br><span class="line">           echo &quot;$&#123;APP_NAME&#125; is not running&quot;</span><br><span class="line">      fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">输出运行状态</span></span><br><span class="line">status() &#123;</span><br><span class="line">    is_exist</span><br><span class="line">    if [ $? -eq &quot;0&quot; ]; then</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; is running. Pid is $&#123;pid&#125;&quot;</span><br><span class="line">    else</span><br><span class="line">       echo &quot;$&#123;APP_NAME&#125; is not running.&quot;</span><br><span class="line">    fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">重启</span></span><br><span class="line">restart() &#123;</span><br><span class="line">   stop</span><br><span class="line">   start</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">根据输入参数，选择执行对应方法，不输入则执行使用说明</span></span><br><span class="line">case &quot;$1&quot; in</span><br><span class="line">     &quot;start&quot;)</span><br><span class="line">     start</span><br><span class="line">     ;;</span><br><span class="line">     &quot;stop&quot;)</span><br><span class="line">     stop</span><br><span class="line">     ;;</span><br><span class="line">     &quot;status&quot;)</span><br><span class="line">     status</span><br><span class="line">     ;;</span><br><span class="line">     &quot;restart&quot;)</span><br><span class="line">     restart</span><br><span class="line">     ;;</span><br><span class="line">     *)</span><br><span class="line">     usage</span><br><span class="line">     ;;</span><br><span class="line">esac       </span><br><span class="line">	   </span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="压测"><a href="#压测" class="headerlink" title="压测"></a>压测</h3><blockquote>
+<p>上方我们部署了程序，并将gc信息打印在了日志当中，接下来我们对web应用的查询课程列表接口进行压测，并且查看对应的gc日志</p>
+</blockquote>
+<p>资料中有提供jmeter，我们使用它来进行压测。</p>
+<p>解压，运行jmeter.cmd（windows）</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202222953142.png" class="" title="image-20211202222953142">
+
+<p>添加线程组：</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202223016219.png" class="" title="image-20211202223016219">
+
+<p>线程数 设置为：500</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202223030363.png" class="" title="image-20211202223030363">
+
+<p>设置请求默认值，为所有请求添加一些公共配置</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202223139907.png" class="" title="image-20211202223139907">
+
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202223330763.png" class="" title="image-20211202223330763">
+
+<p>构造HTTP请求</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202223356251.png" class="" title="image-20211202223356251">
+
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202223834207.png" class="" title="image-20211202223834207">
+
+<p>添加http请求头：</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202223904218.png" class="" title="image-20211202223904218">
+
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202223937781.png" class="" title="image-20211202223937781">
+
+<p>添加断言：</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202224050762.png" class="" title="image-20211202224050762">
+
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202224210622.png" class="" title="image-20211202224210622">
+
+<p>添加查看结果树：</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202225100747.png" class="" title="image-20211202225100747">
+
+<p>点击<code>运行</code>，可以看一下请求是否正确。</p>
+<p>添加加Summary Report：</p>
+<img src="/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/image-20211202225534770.png" class="" title="image-20211202225534770">
+
+<p>点击<code>运行</code>可以查看结果。</p>
+<h4 id="执行测试计划"><a href="#执行测试计划" class="headerlink" title="执行测试计划"></a>执行测试计划</h4><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmeter -n -t web测试.jmx -l web_test/result.txt -e -o web_test/report.out</span><br></pre></td></tr></table></figure>
+
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[GC (Allocation Failure) 2021-12-02T21:40:40.605+0800: 0.833: [DefNew: 157248K-&gt;2109K(157248K), 2.4087729 secs] 359913K-&gt;221248K(506816K), 2.4089225 secs] [Times: user=0.01 sys=0.00, real=0.02 secs]</span><br></pre></td></tr></table></figure>
+
+<p><code>GC</code> ：如果前面没有Full修饰，代表这是一次Minor GC </p>
+<p><code>Allocation Failure</code>：本次引起GC的原因是因为在年轻代中没有足够的空间</p>
+<p><code>DefNew</code>: 串行收集器</p>
+<p><code>157248K-&gt;2109K(157248K)</code>：<strong>单位是KB</strong></p>
+<p>分别代表：GC前该内存区域(这里是年轻代)使用容量，GC后该内存区域使用容量，该内存区域总容量。</p>
+<p><code>2.4087729 secs</code>：该内存区域GC耗时，单位是秒</p>
+<p><code>359913K-&gt;221248K(506816K)</code>：三个参数分别为：堆区垃圾回收前的大小，堆区垃圾回收后的大小，堆区总大小。</p>
+<p><code>2.4089225 secs</code>：该内存区域GC耗时，单位是秒</p>
+<p><code>Times: user=0.01 sys=0.00, real=0.02 secs</code>：分别表示用户态耗时，内核态耗时和总耗时</p>
+<p>分析：</p>
+<p>年轻代此次GC减少了：157248-2109&#x3D;155319K</p>
+<p>Heap区总共减少了： 359913-221248&#x3D;138665K</p>
+<p>155319-138665&#x3D;16654K, 代表共有这么16654K从年轻代移动到了老年代</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Full GC (Metadata GC Threshold) 2021-12-02T21:40:45.578+0800: 5.806: [Tenured: 24576K-&gt;30347K(349568K), 0.1040736 secs] 149544K-&gt;30347K(506816K), [Metaspace: 33668K-&gt;33668K(1081344K)], 0.1041350 secs] [Times: user=0.11 sys=0.00, real=0.11 secs</span><br></pre></td></tr></table></figure>
+
+<p><code>Metadata GC Threshold</code>:Metaspace大小达到了GC阈值</p>
+<p><code>Tenured</code>：老年代</p>
+<p><code>24576K-&gt;30347K(349568K)</code>:GC 前该区域已使用容量 -&gt; GC 后该区域已使用容量 (该区域内存总容量)</p>
+<p><code>149544K-&gt;30347K(506816K)</code>:GC 前Java堆已使用容量 -&gt; GC后Java堆已使用容量 （Java堆总容量）</p>
+<p><code>Metaspace: 33668K-&gt;33668K(1081344K)</code>:元空间 使用内存gc前后的变化</p>
+<blockquote>
+<p>通过日志可以看出，Metaspace区并没有真正释放空间，所以怀疑是Metaspace区不够用了。JDK8中，<code>XX:MaxMetaspaceSize</code>确实是没有上限的，最大容量与机器的内存有关；<strong>但是<code>XX:MetaspaceSize</code>是有一个默认值的：21M</strong>。</p>
+</blockquote>
+<p>解决：设置一个<code>XX:MetaspaceSize</code>的JVM启动参数：<code>-XX:MetaspaceSize=128M</code></p>
+<blockquote>
+<p>同时年轻代gc过于频繁，时间也较长，考虑设置的gc相关参数不合理，我们重新设置一个gc参数</p>
+</blockquote>
+<p><code>-XX:+UseG1GC</code>： 设置G1垃圾回收器</p>
+<p><code>-XX:MetaspaceSize=128M</code></p>
+<p><code>-Xms1024m</code>:最小堆内存</p>
+<p><code>-Xmx1024m</code>：最大堆内存</p>
+<p><code>-Xmn384m</code>:新生代大小</p>
+<p><code>-XX:NewRatio</code>:默认2表示新生代占年老代的1&#x2F;2，占整个堆内存的1&#x2F;3。</p>
+<p><code>-XX:SurvivorRatio</code>:默认8表示一个survivor区占用1&#x2F;8的Eden内存，即1&#x2F;10的新生代内存。</p>
+<p><code>-XX:+PrintAdaptiveSizePolicy</code>：自适应策略 ，用于G1调优</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar -Xmx1024m -Xms1024m -Xmn384m -XX:+UseG1GC -XX:MetaspaceSize=128M -XX:+HeapDumpOnOutOfMemoryError -XX:+PrintAdaptiveSizePolicy -XX:HeapDumpPath=sso.dump  -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:sso-api.gc </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[GC pause (G1 Evacuation Pause) (young), 0.0843619 secs]</span><br><span class="line">   [Parallel Time: 83.7 ms, GC Workers: 1]</span><br><span class="line">      [GC Worker Start (ms):  258031.6]</span><br><span class="line">      [Ext Root Scanning (ms):  4.4]</span><br><span class="line">      [Update RS (ms):  15.9]</span><br><span class="line">         [Processed Buffers:  101]</span><br><span class="line">      [Scan RS (ms):  0.6]</span><br><span class="line">      [Code Root Scanning (ms):  0.0]</span><br><span class="line">      [Object Copy (ms):  62.6]</span><br><span class="line">      [Termination (ms):  0.0]</span><br><span class="line">         [Termination Attempts:  1]</span><br><span class="line">      [GC Worker Other (ms):  0.0]</span><br><span class="line">      [GC Worker Total (ms):  83.6]</span><br><span class="line">      [GC Worker End (ms):  258115.2]</span><br><span class="line">   [Code Root Fixup: 0.0 ms]</span><br><span class="line">   [Code Root Purge: 0.0 ms]</span><br><span class="line">   [Clear CT: 0.1 ms]</span><br><span class="line">   [Other: 0.5 ms]</span><br><span class="line">      [Choose CSet: 0.0 ms]</span><br><span class="line">      [Ref Proc: 0.1 ms]</span><br><span class="line">      [Ref Enq: 0.0 ms]</span><br><span class="line">      [Redirty Cards: 0.0 ms]</span><br><span class="line">      [Humongous Register: 0.0 ms]</span><br><span class="line">      [Humongous Reclaim: 0.0 ms]</span><br><span class="line">      [Free CSet: 0.1 ms]</span><br><span class="line">   [Eden: 355.0M(355.0M)-&gt;0.0B(354.0M) Survivors: 29.0M-&gt;30.0M Heap: 752.5M(1024.0M)-&gt;405.0M(1024.0M)]</span><br><span class="line"> [Times: user=0.05 sys=0.03, real=0.08 secs] </span><br></pre></td></tr></table></figure>
+
+<p><code>young</code>:年轻代垃圾回收情况</p>
+<p><code>[Parallel Time: 83.7 ms, GC Workers: 1]</code>:标记着并行阶段的汇总信息。总共花费时间以及GC的工作线程数。</p>
+<p><code> [GC Worker Start (ms):  258031.6]</code>:开始时间</p>
+<p><code>Ext Root Scanning (ms):  4.4</code>: 外部根区扫描。外部根是堆外区。JNI引用，JVM系统目录，Classloaders等</p>
+<p><code>Update RS (ms):  15.9</code>:RSet的处理, UpdateRS:更新RSet的时间信息。**-XX:MaxGCPauseMillis**(默认200ms)参数是限制G1的暂停时间，一般RSet更新的时间小于10%的目标暂停时间是比较可取的。</p>
+<p><code>Code Root Scanning (ms):  0.0</code>:代码根的扫描</p>
+<p><code>Object Copy (ms):  62.6</code>：该任务主要是对CSet中存活对象进行转移（复制）。对象拷贝的时间一般占用暂停时间的主要部分。如果拷贝时间和”预测暂停时间“有相差很大，也可以调整年轻代尺寸大小。</p>
+<p><code>Termination (ms):  0.0</code>：终止工作线程。Work线程在工作终止前会检查其他工作线程的任务，如果其他work线程有没完成的任务，会抢活。如果终止时间较长，可能是某个work线程在某项任务执行时间过长。</p>
+<p><code>GC Worker Other (ms):  0.0</code>:花在GC之外的工作线程的时间，比如因为JVM的某个活动，导致GC线程被停掉。这部分消耗的时间不是真正花在GC上，只是作为log的一部分记录。</p>
+<p><code>GC Worker Total (ms):  83.6</code>:并行阶段的GC汇总，包含了GC以及GC Worker Other的总时间</p>
+<p><code>GC 串行活动</code>:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[Code Root Fixup: <span class="number">0.0</span> ms]</span><br><span class="line">  [Code Root Purge: <span class="number">0.0</span> ms]</span><br><span class="line">  [Clear CT: <span class="number">0.1</span> ms]</span><br></pre></td></tr></table></figure>
+
+<p>串行的GC活动。包括代码根的更新和扫描。Clear的时候还要清理RSet相应去除的Card Table信息。G1 GC在扫描Card信息时会有一个标记记录，防止重复扫描同一个Card。</p>
+<p><code>GC Other活动</code>:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">剩余的部分就是其他GC活动了。主要包含:选择CSet、引用处理和排队、卡片重新脏化、回收空闲巨型分区以及在收集之后释放CSet</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[Other: <span class="number">0.5</span> ms]</span><br><span class="line">     [Choose CSet: <span class="number">0.0</span> ms]</span><br><span class="line">     [Ref Proc: <span class="number">0.1</span> ms]</span><br><span class="line">     [Ref Enq: <span class="number">0.0</span> ms]</span><br><span class="line">     [Redirty Cards: <span class="number">0.0</span> ms]</span><br><span class="line">     [Humongous Register: <span class="number">0.0</span> ms]</span><br><span class="line">     [Humongous Reclaim: <span class="number">0.0</span> ms]</span><br><span class="line">     [Free CSet: <span class="number">0.1</span> ms]</span><br></pre></td></tr></table></figure>
+
+<p><code>垃圾收集结果统计</code>: [Eden: 355.0M(355.0M)-&gt;0.0B(354.0M) Survivors: 29.0M-&gt;30.0M Heap: 752.5M(1024.0M)-&gt;405.0M(1024.0M)]</p>
+<p><code>Eden: 355.0M(355.0M)-&gt;0.0B(354.0M)</code>: Eden分区GC前355M,GC后是0,括号里面的分别是GC前后Eden分区的总大小。可以看到在一次GC后，Eden的空间做了调整。G1 GC的暂停时间是可预测的，所以YoungGC之后，会根据pause time的目标重新计算需要的Eden分区数，进行动态调整。</p>
+<p><code>Survivors: 29.0M-&gt;30.0M </code>: Survivors空间的变化，空间增长了，说明有存活对象E区晋升到S区。</p>
+<p><code>Heap: 752.5M(1024.0M)-&gt;405.0M(1024.0M)</code>：整个堆区的GC前后空间数据，G1 GC会动态调整堆区，但这次回收中没有改变堆区的容量。</p>
+<p><code>年轻代调优</code>:</p>
+<p>因为G1 GC是启发式算法，会动态调整年轻代的空间大小。目标也就是为了达到接近预期的暂停时间。年轻代调优中比较重要的就是对暂停时间的处理。一般都是根据MaxGCPauseMillis以及年轻代占比G1NewSizePercent、G1MaxNewSizePercent，结合应用的特点和GC数据进行接近期望pause time的调整。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">26.139</span>: [GC <span class="title function_">pause</span> <span class="params">(G1 Evacuation Pause)</span> (young) <span class="number">26.139</span>: [G1Ergonomics (CSet Construction) start choosing CSet, _pending_cards: <span class="number">3484</span>, predicted base time: <span class="number">5.51</span> ms, remaining time: <span class="number">194.49</span> ms, target pause time: <span class="number">200.00</span> ms]</span><br><span class="line"> <span class="number">26.139</span>: [G1Ergonomics (CSet Construction) add young regions to CSet, eden: <span class="number">54</span> regions, survivors: <span class="number">9</span> regions, predicted young region time: <span class="number">5.98</span> ms]</span><br><span class="line"> <span class="number">26.139</span>: [G1Ergonomics (CSet Construction) finish choosing CSet, eden: <span class="number">54</span> regions, survivors: <span class="number">9</span> regions, old: <span class="number">0</span> regions, predicted pause time: <span class="number">11.49</span> ms, target pause time: <span class="number">200.00</span> ms]</span><br><span class="line">, <span class="number">0.0163685</span> secs]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>target也即目标是200ms,实际的pause time是16ms。远远小于目标暂停时间。并且再CSet中的分区数是“eden: 54 regions, survivors: 9 regions”，可以适当增加CSet中的年轻代分区,也可以适当缩短暂停时间，让实际值和期望值不断接近。</p>
+</blockquote>
+<h2 id="推荐配置"><a href="#推荐配置" class="headerlink" title="推荐配置"></a>推荐配置</h2><p>JVM推荐配置原则：</p>
+<blockquote>
+<ol>
+<li>应用程序运行时，计算老年代存活对象的占用空间大小X。程序整个堆大小（Xmx和Xms）设置为X的3 ~ 4倍；永久代PermSize和MaxPermSize设置为X的1.2 ~ 1.5倍。年轻代Xmn的设置为X的1 ~ 1.5倍。老年代内存大小设置为X的2 ~ 3倍。</li>
+<li>JDK官方建议年轻代占整个堆大小空间的3&#x2F;8左右。</li>
+<li>完成一次Full GC后，应该释放出70%的堆空间（30%的空间仍然占用）。</li>
+</ol>
+</blockquote>
+<h1 id="加密"><a href="#加密" class="headerlink" title="加密"></a>加密</h1><blockquote>
+<p>部署上线的应用，密码在配置文件中明文，这样是极为不安全的，所以我们需要对密码进行加密处理</p>
+</blockquote>
+<p>我们使用<code>jasypt</code>来对application.properties配置文件中的mysql账号和密码进行加密</p>
+<ol>
+<li><p>引入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.github.ulisesbocchio<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jasypt-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>将字符串进行加密</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mszlu.xt.web.config;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"><span class="keyword">import</span> org.jasypt.util.text.BasicTextEncryptor;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TestEncode</span> &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">BasicTextEncryptor</span> <span class="variable">textEncryptor</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BasicTextEncryptor</span>();</span><br><span class="line">        <span class="comment">//加密所需的salt(盐)</span></span><br><span class="line">        textEncryptor.setPassword(<span class="string">&quot;mszlu&quot;</span>);</span><br><span class="line">        <span class="comment">//要加密的数据（数据库的用户名或密码）</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">username</span> <span class="operator">=</span> textEncryptor.encrypt(<span class="string">&quot;root&quot;</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">password</span> <span class="operator">=</span> textEncryptor.encrypt(<span class="string">&quot;root&quot;</span>);</span><br><span class="line">        log.info(<span class="string">&quot;username:&#123;&#125;&quot;</span>,username);</span><br><span class="line">        log.info(<span class="string">&quot;password:&#123;&#125;&quot;</span>,password);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>替换配置文件中数据库账号密码的部分</p>
+</li>
+</ol>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#数据库配置</span></span><br><span class="line"><span class="attr">spring.datasource.driver-class-name</span>=<span class="string">com.mysql.cj.jdbc.Driver</span></span><br><span class="line"><span class="attr">spring.datasource.url</span>=<span class="string">jdbc:mysql://localhost:3306/xt?useUnicode=true&amp;characterEncoding=utf-8&amp;serverTimezone=UTC</span></span><br><span class="line"><span class="attr">spring.datasource.username</span>=<span class="string">ENC(PmgAc8SnQp2AWWI7l2I78w==)</span></span><br><span class="line"><span class="attr">spring.datasource.password</span>=<span class="string">ENC(wkYb0BqIvK/hArr5it/lDg==)</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>运行jar的时候，外部指定加密盐</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar -Djasypt.encryptor.password=mszlu xx.jar</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>上线前准备已经做完，可以开始上线了</p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://www.wsyssl.top">wsy</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://www.wsyssl.top/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/">https://www.wsyssl.top/2023/02/01/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2-jvm%E8%B0%83%E4%BC%98/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/JVM/">JVM</a></div><div class="post_share"><div class="social-share" data-image="https://images8.alphacoders.com/131/thumbbig-1319479.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/cat.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">wsy</div><div class="author-info__description">The future returns to the future</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><a id="card-info-btn" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/wsyyyyyyyy" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://leetcode.cn/u/phaseless/" target="_blank" title="leetcode"><i class="iconfont icon-leetcode1"></i></a><a class="social-icon" href="https://blog.csdn.net/m0_53737524?spm=1000.2115.3001.5343" target="_blank" title="csdn"><i class="iconfont icon-csdn"></i></a><a class="social-icon" href="https://qm.qq.com/cgi-bin/qm/qr?_wv=1027&amp;k=SH0NG_q3x5gOXxiLzND8PKXQR0Gl8TRY&amp;authKey=DklK56k%2BJ%2FBR%2B03qcZb4ArdzcWteVxLBc56qXw3WRzOVII65gwfEWYEG68%2FWTZrN&amp;noverify=0&amp;group_code=715091865" target="_blank" title=""><i class="fab fa-qq"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95"><span class="toc-number">1.</span> <span class="toc-text">索引</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#mysql%E6%95%B0%E6%8D%AE%E9%A1%B5"><span class="toc-number">1.1.</span> <span class="toc-text">mysql数据页</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8C%BA"><span class="toc-number">1.2.</span> <span class="toc-text">数据区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#B-TREE%E5%92%8CB-TREE"><span class="toc-number">1.3.</span> <span class="toc-text">B-TREE和B+TREE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%A1%B5%E5%88%86%E8%A3%82%E9%97%AE%E9%A2%98"><span class="toc-number">1.4.</span> <span class="toc-text">数据页分裂问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM%E8%B0%83%E4%BC%98"><span class="toc-number">2.</span> <span class="toc-text">JVM调优</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E4%BB%A3%E5%9B%9E%E6%94%B6"><span class="toc-number">2.1.</span> <span class="toc-text">分代回收</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FullGC"><span class="toc-number">2.2.</span> <span class="toc-text">FullGC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E7%A1%AE%E5%AE%9A%E5%8F%82%E6%95%B0"><span class="toc-number">2.3.</span> <span class="toc-text">如何确定参数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E5%88%B0%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="toc-number">2.3.1.</span> <span class="toc-text">项目部署到虚拟机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%8B%E6%B5%8B"><span class="toc-number">2.3.2.</span> <span class="toc-text">压测</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E6%B5%8B%E8%AF%95%E8%AE%A1%E5%88%92"><span class="toc-number">2.3.2.1.</span> <span class="toc-text">执行测试计划</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90"><span class="toc-number">2.3.3.</span> <span class="toc-text">分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A8%E8%8D%90%E9%85%8D%E7%BD%AE"><span class="toc-number">2.4.</span> <span class="toc-text">推荐配置</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%A0%E5%AF%86"><span class="toc-number">3.</span> <span class="toc-text">加密</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/08/27/%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%AE%9A%E6%97%B6-%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF%EF%BC%9F/" title="延时消息:如何实现高性能的定时/延时消息？"><img src="https://images.alphacoders.com/132/thumbbig-1323666.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="延时消息:如何实现高性能的定时/延时消息？"/></a><div class="content"><a class="title" href="/2023/08/27/%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%AE%9A%E6%97%B6-%E5%BB%B6%E6%97%B6%E6%B6%88%E6%81%AF%EF%BC%9F/" title="延时消息:如何实现高性能的定时/延时消息？">延时消息:如何实现高性能的定时/延时消息？</a><time datetime="2023-08-27T02:43:46.000Z" title="Created 2023-08-27 10:43:46">2023-08-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/" title="API网关调研报告"><img src="https://images4.alphacoders.com/937/thumbbig-937406.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="API网关调研报告"/></a><div class="content"><a class="title" href="/2023/08/25/API%E7%BD%91%E5%85%B3%E8%B0%83%E7%A0%94%E6%8A%A5%E5%91%8A/" title="API网关调研报告">API网关调研报告</a><time datetime="2023-08-25T13:18:22.000Z" title="Created 2023-08-25 21:18:22">2023-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/25/Sanfor%E5%AE%9E%E4%B9%A0-%E6%95%B0%E6%8D%AE%E4%BF%A1%E9%81%93/" title="Sanfor实习-数据信道"><img src="https://images2.alphacoders.com/939/thumbbig-939436.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Sanfor实习-数据信道"/></a><div class="content"><a class="title" href="/2023/08/25/Sanfor%E5%AE%9E%E4%B9%A0-%E6%95%B0%E6%8D%AE%E4%BF%A1%E9%81%93/" title="Sanfor实习-数据信道">Sanfor实习-数据信道</a><time datetime="2023-08-25T06:58:56.000Z" title="Created 2023-08-25 14:58:56">2023-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/17/API%E7%BD%91%E5%85%B3-%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%BC%80%E5%8F%91/" title="API网关-注册中心的设计与开发"><img src="https://images4.alphacoders.com/937/thumbbig-937402.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="API网关-注册中心的设计与开发"/></a><div class="content"><a class="title" href="/2023/08/17/API%E7%BD%91%E5%85%B3-%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%BC%80%E5%8F%91/" title="API网关-注册中心的设计与开发">API网关-注册中心的设计与开发</a><time datetime="2023-08-17T06:16:09.000Z" title="Created 2023-08-17 14:16:09">2023-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/" title="Sanfor实习-大模型数据存储调研方案"><img src="https://images2.alphacoders.com/937/thumbbig-937391.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Sanfor实习-大模型数据存储调研方案"/></a><div class="content"><a class="title" href="/2023/08/14/Sanfor%E5%AE%9E%E4%B9%A0-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E8%B0%83%E7%A0%94%E6%96%B9%E6%A1%88/" title="Sanfor实习-大模型数据存储调研方案">Sanfor实习-大模型数据存储调研方案</a><time datetime="2023-08-14T04:26:33.000Z" title="Created 2023-08-14 12:26:33">2023-08-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By wsy</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading the Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div><hr/><div class="no-result" id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body></html>
